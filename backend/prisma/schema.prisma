@@ -20,6 +20,7 @@ model User {
   isActive      Boolean        @default(true)
   roles         UserRole[]
   refreshTokens RefreshToken[]
+  ownedLeads    Lead[]         @relation("LeadOwner")
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
 
@@ -75,4 +76,76 @@ model RefreshToken {
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+// ===== Faz 3 — Satış (Lead) & Kanban =====
+
+model Pipeline {
+  id        String   @id @default(uuid())
+  name      String
+  isDefault Boolean  @default(false)
+  stages    Stage[]
+  leads     Lead[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Stage {
+  id         String   @id @default(uuid())
+  pipelineId String
+  name       String // örn: Yeni, İletişim, Teklif, Kazanıldı, Kaybedildi
+  position   Int // sütun sırası
+  isWon      Boolean  @default(false)
+  isLost     Boolean  @default(false)
+  pipeline   Pipeline @relation(fields: [pipelineId], references: [id], onDelete: Cascade)
+  leads      Lead[]
+
+  @@unique([pipelineId, position])
+  @@index([pipelineId])
+}
+
+enum LeadStatus {
+  OPEN
+  WON
+  LOST
+}
+
+model Lead {
+  id          String         @id @default(uuid())
+  pipelineId  String
+  stageId     String
+  title       String
+  contactName String?
+  email       String?
+  phone       String?
+  company     String?
+  value       Decimal?       @db.Decimal(14, 2) // tahmini değer
+  currency    String         @default("TRY")
+  // Kanban içi sıralama — kesirli rank (çakışmasız taşıma için)
+  rank        Decimal        @db.Decimal(30, 15)
+  ownerId     String? // atanan satış temsilcisi
+  status      LeadStatus     @default(OPEN)
+  pipeline    Pipeline       @relation(fields: [pipelineId], references: [id])
+  stage       Stage          @relation(fields: [stageId], references: [id])
+  owner       User?          @relation("LeadOwner", fields: [ownerId], references: [id])
+  activities  LeadActivity[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  deletedAt   DateTime? // soft delete
+
+  @@index([stageId, rank])
+  @@index([ownerId])
+  @@index([pipelineId, status])
+}
+
+model LeadActivity {
+  id        String   @id @default(uuid())
+  leadId    String
+  userId    String
+  type      String // NOTE, STAGE_CHANGE, CALL, EMAIL
+  payload   Json? // {from, to} vb.
+  createdAt DateTime @default(now())
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([leadId, createdAt])
 }

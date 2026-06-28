@@ -69,11 +69,31 @@ async function main() {
     create: { userId: admin.id, roleId: adminRole.id },
   });
 
+  // 4) Varsayılan pipeline + stage'ler (idempotent).
+  let pipeline = await prisma.pipeline.findFirst({ where: { isDefault: true } });
+  if (!pipeline) {
+    pipeline = await prisma.pipeline.create({
+      data: {
+        name: 'Satış Hattı',
+        isDefault: true,
+        stages: {
+          create: [
+            { name: 'Yeni', position: 0 },
+            { name: 'İletişim', position: 1 },
+            { name: 'Teklif', position: 2 },
+            { name: 'Kazanıldı', position: 3, isWon: true },
+            { name: 'Kaybedildi', position: 4, isLost: true },
+          ],
+        },
+      },
+    });
+  }
+
   // Güvenlik: düz parola loglanmaz.
   console.log(
     `Seed tamam. İzinler: ${ALL_PERMISSIONS.length}, roller: ${
       Object.keys(DEFAULT_ROLE_PERMISSIONS).length
-    }. Admin: ${adminEmail} (ADMIN).`,
+    }. Admin: ${adminEmail} (ADMIN). Pipeline: ${pipeline.name} (5 stage).`,
   );
 }
 
