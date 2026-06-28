@@ -1,0 +1,28 @@
+# docker-compose.yml — Geliştirme için yalnızca PostgreSQL.
+# Uygulamanın tam Dockerization'ı Faz 6'da gelecek. Bu dosya yerel geliştirme/
+# test için bağımsız bir veritabanı sağlar.
+#
+# Kullanım:
+#   docker compose up -d
+#   cd backend && npx prisma migrate dev && npm run seed && npm run start:dev
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: crm-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: acik_kaynak_crm
+    ports:
+      - '5432:5432'
+    volumes:
+      - crm_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d acik_kaynak_crm']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  crm_pgdata:

@@ -30,17 +30,25 @@ secure-by-default, DRY/SOLID. Detaylar: [`docs/`](./docs).
 ## Hızlı Başlangıç (Backend)
 
 ```bash
+# 1) Geliştirme veritabanını başlat (Docker)
+docker compose up -d           # PostgreSQL 16 → localhost:5432
+
+# 2) Backend
 cd backend
-cp .env.example .env          # değerleri doldur (JWT secret'ları vb.)
+cp .env.example .env           # değerleri doldur (JWT secret'ları vb.)
 npm install
-npx prisma migrate dev        # PostgreSQL şemasını oluştur
-npm run seed                  # ADMIN rolü + admin kullanıcı
-npm run start:dev             # http://localhost:3000  (Swagger: /api/docs)
+npx prisma migrate dev         # PostgreSQL şemasını oluştur
+npm run seed                   # ADMIN rolü + admin kullanıcı
+npm run start:dev              # http://localhost:3000  (Swagger: /api/docs)
 ```
+
+> `.env.example` içindeki varsayılan `DATABASE_URL`, `docker compose` ile gelen
+> Postgres ile uyumludur. PostgreSQL'i kendiniz çalıştırıyorsanız `docker compose`
+> adımını atlayıp `DATABASE_URL`'i kendi sunucunuza göre güncelleyin.
 
 ### Gereksinimler
 - Node.js ≥ 20
-- PostgreSQL ≥ 14
+- PostgreSQL ≥ 14 (veya `docker compose` ile gelen Postgres 16)
 
 ## Komutlar (backend)
 
