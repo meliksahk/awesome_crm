@@ -113,33 +113,34 @@ enum DealStatus {
 }
 
 model Deal {
-  id          String         @id @default(uuid())
-  pipelineId  String
-  stageId     String
-  title       String
-  contactName String?
-  email       String?
-  phone       String?
-  company     String?
-  value       Decimal?       @db.Decimal(14, 2) // tahmini değer
-  currency    String         @default("TRY")
+  id           String         @id @default(uuid())
+  pipelineId   String
+  stageId      String
+  title        String
+  contactName  String?
+  email        String?
+  phone        String?
+  company      String?
+  value        Decimal?       @db.Decimal(14, 2) // tahmini değer
+  currency     String         @default("TRY")
   // Kanban içi sıralama — kesirli rank (çakışmasız taşıma için)
-  rank        Decimal        @db.Decimal(30, 15)
-  ownerId     String? // atanan satış temsilcisi
+  rank         Decimal        @db.Decimal(30, 15)
+  ownerId      String? // atanan satış temsilcisi
   // v2.1: Deal artık Contact/Company'ye bağlanır (nullable — kademeli geçiş).
-  contactId   String?
-  companyId   String?
-  status      DealStatus     @default(OPEN)
-  pipeline    Pipeline       @relation(fields: [pipelineId], references: [id])
-  stage       Stage          @relation(fields: [stageId], references: [id])
-  owner       User?          @relation("DealOwner", fields: [ownerId], references: [id])
-  activities  DealActivity[]
-  invoices    Invoice[]
+  contactId    String?
+  companyId    String?
+  customFields Json?
+  status       DealStatus     @default(OPEN)
+  pipeline     Pipeline       @relation(fields: [pipelineId], references: [id])
+  stage        Stage          @relation(fields: [stageId], references: [id])
+  owner        User?          @relation("DealOwner", fields: [ownerId], references: [id])
+  activities   DealActivity[]
+  invoices     Invoice[]
   // Faz 6 multi-tenancy: nullable (kademeli geçiş). Bağlam aktifse otomatik atanır/filtrelenir.
-  tenantId    String?
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  deletedAt   DateTime? // soft delete
+  tenantId     String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  deletedAt    DateTime? // soft delete
 
   @@index([stageId, rank])
   @@index([ownerId])
@@ -401,4 +402,35 @@ model AutomationRule {
 
   @@index([trigger, isActive])
   @@index([tenantId])
+}
+
+// ===== v2.5 — Özel alanlar (low-code) =====
+
+enum CustomFieldEntity {
+  DEAL
+  CONTACT
+  COMPANY
+  LEAD
+}
+
+enum CustomFieldType {
+  TEXT
+  NUMBER
+  BOOLEAN
+  DATE
+  SELECT
+}
+
+model CustomFieldDef {
+  id        String            @id @default(uuid())
+  entity    CustomFieldEntity
+  key       String
+  label     String
+  type      CustomFieldType
+  options   String[]          @default([]) // SELECT için
+  required  Boolean           @default(false)
+  createdAt DateTime          @default(now())
+
+  @@unique([entity, key])
+  @@index([entity])
 }

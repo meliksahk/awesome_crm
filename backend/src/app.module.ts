@@ -25,6 +25,7 @@ import { ContactsModule } from './modules/contacts/contacts.module';
 import { MeetingsModule } from './modules/meetings/meetings.module';
 import { AutomationModule } from './modules/automation/automation.module';
 import { ReportsModule } from './modules/reports/reports.module';
+import { CustomFieldsModule } from './modules/custom-fields/custom-fields.module';
 import { TenantMiddleware } from './common/tenant/tenant.middleware';
 
 @Module({
@@ -58,6 +59,7 @@ import { TenantMiddleware } from './common/tenant/tenant.middleware';
     MeetingsModule,
     AutomationModule,
     ReportsModule,
+    CustomFieldsModule,
   ],
   providers: [
     // Guard sırası önemli: kimlik → rol → izin (her biri bir öncekine dayanır).

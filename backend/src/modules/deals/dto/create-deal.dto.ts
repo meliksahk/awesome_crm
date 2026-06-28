@@ -3,6 +3,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsEmail,
   IsNumberString,
+  IsObject,
   IsOptional,
   IsString,
   IsUUID,
@@ -60,4 +61,10 @@ export class CreateDealDto {
   @IsString()
   @Length(3, 3)
   currency?: string;
+
+  // v2.5 — tanımlı özel alanlar (Service'te doğrulanır).
+  @ApiPropertyOptional({ type: Object })
+  @IsOptional()
+  @IsObject()
+  customFields?: Record<string, unknown>;
 }

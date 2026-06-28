@@ -3,6 +3,7 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsEmail,
   IsNumberString,
+  IsObject,
   IsOptional,
   IsString,
   Length,
@@ -52,4 +53,9 @@ export class UpdateDealDto {
   @IsString()
   @Length(3, 3)
   currency?: string;
+
+  @ApiPropertyOptional({ type: Object })
+  @IsOptional()
+  @IsObject()
+  customFields?: Record<string, unknown>;
 }

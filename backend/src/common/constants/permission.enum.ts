@@ -66,6 +66,11 @@ export const PERMISSIONS = {
     READ: 'automation.read',
     MANAGE: 'automation.manage',
   },
+  // v2.5 — özel alan tanımları
+  CUSTOM_FIELD: {
+    READ: 'custom_field.read',
+    MANAGE: 'custom_field.manage',
+  },
 } as const;
 
 // Tüm izinlerin düz listesi (seed + doğrulama için).
@@ -115,6 +120,8 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, string[]> = {
     PERMISSIONS.MEETING.DELETE,
     PERMISSIONS.AUTOMATION.READ,
     PERMISSIONS.AUTOMATION.MANAGE,
+    PERMISSIONS.CUSTOM_FIELD.READ,
+    PERMISSIONS.CUSTOM_FIELD.MANAGE,
   ],
   [ROLE_NAMES.SALES]: [
     PERMISSIONS.DEAL.CREATE,
@@ -139,6 +146,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, string[]> = {
     PERMISSIONS.CONTACT.CREATE,
     PERMISSIONS.CONTACT.READ,
     PERMISSIONS.CONTACT.UPDATE,
+    PERMISSIONS.CUSTOM_FIELD.READ,
   ],
   [ROLE_NAMES.FINANCE]: [
     PERMISSIONS.INVOICE.CREATE,
@@ -157,5 +165,6 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, string[]> = {
     PERMISSIONS.CONTACT.READ,
     PERMISSIONS.LEAD.READ,
     PERMISSIONS.MEETING.READ,
+    PERMISSIONS.CUSTOM_FIELD.READ,
   ],
 };

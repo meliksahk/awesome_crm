@@ -27,6 +27,7 @@ const dealRecord = (over: Record<string, unknown> = {}) => ({
   rank: new Prisma.Decimal(1),
   ownerId: 'actor-1',
   status: DealStatus.OPEN,
+  customFields: null,
   createdAt: new Date(),
   updatedAt: new Date(),
   ...over,
@@ -54,7 +55,10 @@ describe('DealsService', () => {
       getActivities: jest.fn(),
     } as unknown as typeof repo;
     const events = { emit: jest.fn() } as unknown as EventEmitter2;
-    service = new DealsService(repo as unknown as DealsRepository, events);
+    const cf = {
+      validateValues: jest.fn().mockResolvedValue({}),
+    } as unknown as import('../custom-fields/custom-fields.service').CustomFieldsService;
+    service = new DealsService(repo as unknown as DealsRepository, events, cf);
   });
 
   // U-3.5

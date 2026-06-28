@@ -11,6 +11,7 @@ import { DealStatus, Prisma } from '@prisma/client';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { ROLE_NAMES } from '../../common/constants/permission.enum';
 import { AuthenticatedUser } from '../../common/decorators/current-user.decorator';
+import { CustomFieldsService } from '../custom-fields/custom-fields.service';
 import { DealsRepository } from './deals.repository';
 import { computeRank, RANK_GAP } from './rank.util';
 import { CreateDealDto } from './dto/create-deal.dto';
@@ -37,6 +38,7 @@ interface DealRecord {
   rank: Prisma.Decimal;
   ownerId: string | null;
   status: DealStatus;
+  customFields: Prisma.JsonValue | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -48,6 +50,7 @@ export class DealsService {
   constructor(
     private readonly repo: DealsRepository,
     private readonly events: EventEmitter2,
+    private readonly customFields: CustomFieldsService,
   ) {}
 
   async create(dto: CreateDealDto, actor: AuthenticatedUser) {
@@ -59,6 +62,13 @@ export class DealsService {
     if (stage.pipelineId !== dto.pipelineId) {
       throw new BadRequestException("Stage, belirtilen pipeline'a ait değil.");
     }
+
+    // Özel alanları tanımlara göre doğrula (v2.5).
+    const customFields = await this.customFields.validateValues(
+      'DEAL',
+      dto.customFields,
+      true,
+    );
 
     // Yeni kart sütunun sonuna yerleşir.
     const maxRank = await this.repo.maxRankInStage(dto.stageId);
@@ -72,6 +82,7 @@ export class DealsService {
       company: dto.company,
       value: dto.value ?? null,
       currency: dto.currency ?? 'TRY',
+      customFields: customFields as Prisma.InputJsonValue,
       rank,
       status: DealStatus.OPEN,
       pipeline: { connect: { id: dto.pipelineId } },
@@ -137,7 +148,7 @@ export class DealsService {
   async update(id: string, dto: UpdateDealDto, actor: AuthenticatedUser) {
     const deal = await this.getDealOrThrow(id);
     this.assertCanWrite(deal, actor);
-    const updated = await this.repo.update(id, {
+    const data: Prisma.DealUpdateInput = {
       title: dto.title,
       contactName: dto.contactName,
       email: dto.email,
@@ -145,7 +156,15 @@ export class DealsService {
       company: dto.company,
       value: dto.value ?? undefined,
       currency: dto.currency,
-    });
+    };
+    if (dto.customFields !== undefined) {
+      data.customFields = (await this.customFields.validateValues(
+        'DEAL',
+        dto.customFields,
+        false,
+      )) as Prisma.InputJsonValue;
+    }
+    const updated = await this.repo.update(id, data);
     return this.toView(updated as DealRecord);
   }
 
@@ -296,6 +315,7 @@ export class DealsService {
       rank: l.rank.toString(),
       ownerId: l.ownerId,
       status: l.status,
+      customFields: l.customFields ?? {},
       createdAt: l.createdAt,
       updatedAt: l.updatedAt,
     };
