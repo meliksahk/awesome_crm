@@ -19,6 +19,9 @@ export function Sidebar() {
         {can('invoice.read') && <NavItem href="/invoices" label="Faturalar" />}
         {can('deal.read') && <NavItem href="/reports" label="Raporlar" />}
         {can('ai.use') && <NavItem href="/ai" label="AI Asistan" />}
+        {(can('data.export') || can('data.import')) && (
+          <NavItem href="/data" label="Veri" />
+        )}
         {can('user.read') && <NavItem href="/users" label="Kullanıcılar" />}
       </nav>
     </aside>

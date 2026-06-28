@@ -91,6 +91,12 @@ export const PERMISSIONS = {
     SEND: 'quote.send',
     CONVERT: 'quote.convert',
   },
+  // v2.8 — veri içe/dışa aktarma + birleştirme
+  DATA: {
+    EXPORT: 'data.export',
+    IMPORT: 'data.import',
+    MERGE: 'data.merge',
+  },
 } as const;
 
 // Tüm izinlerin düz listesi (seed + doğrulama için).
@@ -153,6 +159,9 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, string[]> = {
     PERMISSIONS.QUOTE.DELETE,
     PERMISSIONS.QUOTE.SEND,
     PERMISSIONS.QUOTE.CONVERT,
+    PERMISSIONS.DATA.EXPORT,
+    PERMISSIONS.DATA.IMPORT,
+    PERMISSIONS.DATA.MERGE,
   ],
   [ROLE_NAMES.SALES]: [
     PERMISSIONS.DEAL.CREATE,
@@ -185,6 +194,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, string[]> = {
     PERMISSIONS.QUOTE.UPDATE,
     PERMISSIONS.QUOTE.SEND,
     PERMISSIONS.QUOTE.CONVERT,
+    PERMISSIONS.DATA.EXPORT,
   ],
   [ROLE_NAMES.FINANCE]: [
     PERMISSIONS.INVOICE.CREATE,

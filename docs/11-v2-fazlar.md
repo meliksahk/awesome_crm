@@ -46,8 +46,13 @@ disiplini korunur.
 - Frontend: Ürünler + Teklifler sayfaları (liste/oluştur, gönder/faturala).
 - Test: 11 unit + 6 e2e (CPQ akışı: ürün→teklif→gönder→faturala→çift dönüşüm).
 
-## V2.8 — Entegrasyon & veri
-- CSV import/export, dedup/merge.
+## V2.8 — Entegrasyon & veri — ✅ TAMAM
+- Bağımsız CSV util (RFC4180 benzeri parse/stringify). `/data/export/:entity`
+  (contacts|companies|deals, ham CSV — @Res zarf bypass), `/data/import/:entity`
+  (contacts|companies, e-posta/ad dedup + satır hataları), `/data/duplicates/:entity`
+  (groupBy), `/data/merge/:entity` (kaynak→hedef deal/kişi taşı + sil, tek transaction).
+- İzinler `data.export`/`data.import`/`data.merge`. Frontend: Veri sayfası
+  (indir + yapıştır-içe aktar). Test: 5 unit (csv) + 7 e2e.
 
 ## V2.9 — Platform olgunluk
 - `AuditLog` tablosu, full-text arama, bildirim, GDPR dışa aktar/sil, mobil PWA.
