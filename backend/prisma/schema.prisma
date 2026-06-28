@@ -1,0 +1,78 @@
+// backend/prisma/schema.prisma
+// Faz 1 — Temel veri modeli: User, Role, Permission + ilişki tabloları + RefreshToken.
+// İlişki (join) tabloları açıkça modellenir → ileride ek alan (atayan/tarih) eklenebilir.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  passwordHash  String // bcrypt; düz parola ASLA saklanmaz
+  firstName     String
+  lastName      String
+  isActive      Boolean        @default(true)
+  roles         UserRole[]
+  refreshTokens RefreshToken[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([email])
+}
+
+model Role {
+  id          String           @id @default(uuid())
+  name        String           @unique // örn: ADMIN, SALES, FINANCE
+  description String?
+  users       UserRole[]
+  permissions RolePermission[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model Permission {
+  id          String           @id @default(uuid())
+  // "kaynak.eylem" biçimi — örn: "lead.create", "invoice.read"
+  action      String           @unique
+  description String?
+  roles       RolePermission[]
+  createdAt   DateTime         @default(now())
+}
+
+// --- İlişki (join) tabloları: many-to-many açık modellenir ---
+
+model UserRole {
+  userId String
+  roleId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String // Refresh token'ın SHA-256 hash'i; ham token saklanmaz
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
