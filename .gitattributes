@@ -1,0 +1,10 @@
+# Tutarlı satır sonları: depoda LF, checkout'ta platforma göre.
+* text=auto eol=lf
+
+# İkili dosyalar (dokunma)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary

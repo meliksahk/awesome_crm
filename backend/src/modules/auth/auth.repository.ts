@@ -15,9 +15,18 @@ export class AuthRepository {
   }
 
   findById(id: string) {
+    // Roller + her rolün izinleri yüklenir → her istekte güncel yetki (token'a güvenilmez).
     return this.prisma.user.findUnique({
       where: { id },
-      include: { roles: { include: { role: true } } },
+      include: {
+        roles: {
+          include: {
+            role: {
+              include: { permissions: { include: { permission: true } } },
+            },
+          },
+        },
+      },
     });
   }
 

@@ -262,4 +262,24 @@ export class AssignRolesDto {
 | S-2.2 | IDOR: başka kullanıcının `:id`'siyle erişim | yetki yoksa `403` |
 | S-2.3 | Privilege escalation API kombinasyonları | hepsinde `403` |
 
+---
+
+## 10. Uygulama Notları (gerçekleşen kararlar)
+
+Faz 2 kodlanırken spec'in ötesinde alınan iki güvenlik sertleştirmesi (dürüstçe işaretlenir):
+
+1. **Oluştururken rol atama ayrı yetki ister.** `POST /users` `user.create` ile çağrılır,
+   ancak gövdede `roleIds` verilirse ek olarak `role.assign` izni aranır. Aksi hâlde
+   `403`. Gerekçe: yalnız `user.create` olan biri kendine/başkasına ADMIN rolü vererek
+   privilege escalation yapamasın.
+2. **ADMIN (süper) rolü kilitlenmeye karşı korunur.** `DELETE /roles/:adminId` → `409`;
+   `PATCH /roles/:adminId/permissions` → `409`. Gerekçe: ADMIN rolünün izinleri çıkarılır
+   veya rol silinirse sistem geri dönülmez biçimde kilitlenebilir (lockout).
+
+**Pragmatik sınır:** Audit izi şu an yapılandırılmış **log** ile tutuluyor
+(`Logger`: kim, kime, ne zaman) — ayrı bir `AuditLog` tablosu ileride eklenebilir.
+
+**Doğrulama:** 24 birim + 18 e2e testi gerçek PostgreSQL ile yeşil
+(canlı yetki iptali E-2.6 dahil: rol kaldırılınca aynı access token sonraki istekte 403).
+
 > **Sonraki faz:** [Faz 3 — Satış (Lead) & Kanban](./03-faz3-lead-kanban.md)

@@ -21,7 +21,7 @@ secure-by-default, DRY/SOLID. Detaylar: [`docs/`](./docs).
 | Faz | Kapsam | Durum |
 |-----|--------|-------|
 | 1 | Temel Mimari + Prisma Şeması + JWT Kimlik Doğrulama | ✅ |
-| 2 | RBAC Guard'ları + Kullanıcı Yönetimi | ⏳ |
+| 2 | RBAC Guard'ları + Kullanıcı Yönetimi | ✅ |
 | 3 | Satış (Lead) Modülü + Kanban | ⏳ |
 | 4 | Finans & Fatura (izole yetkiler) | ⏳ |
 | 5 | Dış Entegrasyonlar (Webhook, SMTP) | ⏳ |

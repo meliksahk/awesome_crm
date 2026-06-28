@@ -32,10 +32,18 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     if (!user || !user.isActive) {
       throw new UnauthorizedException('Kimlik doğrulama gerekli');
     }
+    // İzinler her istekte güncel kaynaktan (DB) toplanır; tekilleştirilir.
+    const permissions = new Set<string>();
+    for (const ur of user.roles) {
+      for (const rp of ur.role.permissions) {
+        permissions.add(rp.permission.action);
+      }
+    }
     return {
       id: user.id,
       email: user.email,
       roles: user.roles.map((ur) => ur.role.name),
+      permissions: [...permissions],
     };
   }
 }
