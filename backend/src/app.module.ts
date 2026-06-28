@@ -19,6 +19,8 @@ import { LeadsModule } from './modules/leads/leads.module';
 import { InvoicesModule } from './modules/invoices/invoices.module';
 import { IntegrationsModule } from './modules/integrations/integrations.module';
 import { HealthModule } from './modules/health/health.module';
+import { CompaniesModule } from './modules/companies/companies.module';
+import { ContactsModule } from './modules/contacts/contacts.module';
 import { TenantMiddleware } from './common/tenant/tenant.middleware';
 
 @Module({
@@ -46,6 +48,8 @@ import { TenantMiddleware } from './common/tenant/tenant.middleware';
     InvoicesModule,
     IntegrationsModule,
     HealthModule,
+    CompaniesModule,
+    ContactsModule,
   ],
   providers: [
     // Guard sırası önemli: kimlik → rol → izin (her biri bir öncekine dayanır).

@@ -33,6 +33,19 @@ export const PERMISSIONS = {
     READ: 'integration.read',
     MANAGE: 'integration.manage',
   },
+  // v2.1 — çekirdek CRM nesneleri
+  COMPANY: {
+    CREATE: 'company.create',
+    READ: 'company.read',
+    UPDATE: 'company.update',
+    DELETE: 'company.delete',
+  },
+  CONTACT: {
+    CREATE: 'contact.create',
+    READ: 'contact.read',
+    UPDATE: 'contact.update',
+    DELETE: 'contact.delete',
+  },
 } as const;
 
 // Tüm izinlerin düz listesi (seed + doğrulama için).
@@ -62,6 +75,15 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, string[]> = {
     // Faz 5: entegrasyon yönetimi yalnız ADMIN/MANAGER.
     PERMISSIONS.INTEGRATION.READ,
     PERMISSIONS.INTEGRATION.MANAGE,
+    // v2.1: çekirdek nesneler — MANAGER tam yetki
+    PERMISSIONS.COMPANY.CREATE,
+    PERMISSIONS.COMPANY.READ,
+    PERMISSIONS.COMPANY.UPDATE,
+    PERMISSIONS.COMPANY.DELETE,
+    PERMISSIONS.CONTACT.CREATE,
+    PERMISSIONS.CONTACT.READ,
+    PERMISSIONS.CONTACT.UPDATE,
+    PERMISSIONS.CONTACT.DELETE,
   ],
   [ROLE_NAMES.SALES]: [
     PERMISSIONS.LEAD.CREATE,
@@ -71,6 +93,12 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, string[]> = {
     // Faz 4: satışçı faturanın varlığını görür ama tutarları göremez
     // (invoice.read_financial YOK → API'de finansal alanlar kesilir).
     PERMISSIONS.INVOICE.READ,
+    // v2.1: satışçı kişi/şirket oluşturur ve yönetir
+    PERMISSIONS.COMPANY.CREATE,
+    PERMISSIONS.COMPANY.READ,
+    PERMISSIONS.CONTACT.CREATE,
+    PERMISSIONS.CONTACT.READ,
+    PERMISSIONS.CONTACT.UPDATE,
   ],
   [ROLE_NAMES.FINANCE]: [
     PERMISSIONS.INVOICE.CREATE,
@@ -85,5 +113,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, string[]> = {
     PERMISSIONS.ROLE.READ,
     PERMISSIONS.LEAD.READ,
     PERMISSIONS.INVOICE.READ,
+    PERMISSIONS.COMPANY.READ,
+    PERMISSIONS.CONTACT.READ,
   ],
 };
