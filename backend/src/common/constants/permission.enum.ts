@@ -75,6 +75,22 @@ export const PERMISSIONS = {
   AI: {
     USE: 'ai.use',
   },
+  // v2.7 — ürün kataloğu
+  PRODUCT: {
+    CREATE: 'product.create',
+    READ: 'product.read',
+    UPDATE: 'product.update',
+    DELETE: 'product.delete',
+  },
+  // v2.7 — teklif (CPQ)
+  QUOTE: {
+    CREATE: 'quote.create',
+    READ: 'quote.read',
+    UPDATE: 'quote.update',
+    DELETE: 'quote.delete',
+    SEND: 'quote.send',
+    CONVERT: 'quote.convert',
+  },
 } as const;
 
 // Tüm izinlerin düz listesi (seed + doğrulama için).
@@ -127,6 +143,16 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, string[]> = {
     PERMISSIONS.CUSTOM_FIELD.READ,
     PERMISSIONS.CUSTOM_FIELD.MANAGE,
     PERMISSIONS.AI.USE,
+    PERMISSIONS.PRODUCT.CREATE,
+    PERMISSIONS.PRODUCT.READ,
+    PERMISSIONS.PRODUCT.UPDATE,
+    PERMISSIONS.PRODUCT.DELETE,
+    PERMISSIONS.QUOTE.CREATE,
+    PERMISSIONS.QUOTE.READ,
+    PERMISSIONS.QUOTE.UPDATE,
+    PERMISSIONS.QUOTE.DELETE,
+    PERMISSIONS.QUOTE.SEND,
+    PERMISSIONS.QUOTE.CONVERT,
   ],
   [ROLE_NAMES.SALES]: [
     PERMISSIONS.DEAL.CREATE,
@@ -153,6 +179,12 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, string[]> = {
     PERMISSIONS.CONTACT.UPDATE,
     PERMISSIONS.CUSTOM_FIELD.READ,
     PERMISSIONS.AI.USE,
+    PERMISSIONS.PRODUCT.READ,
+    PERMISSIONS.QUOTE.CREATE,
+    PERMISSIONS.QUOTE.READ,
+    PERMISSIONS.QUOTE.UPDATE,
+    PERMISSIONS.QUOTE.SEND,
+    PERMISSIONS.QUOTE.CONVERT,
   ],
   [ROLE_NAMES.FINANCE]: [
     PERMISSIONS.INVOICE.CREATE,
@@ -160,6 +192,9 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, string[]> = {
     PERMISSIONS.INVOICE.UPDATE,
     PERMISSIONS.INVOICE.DELETE,
     PERMISSIONS.INVOICE.READ_FINANCIAL,
+    PERMISSIONS.PRODUCT.READ,
+    PERMISSIONS.QUOTE.READ,
+    PERMISSIONS.QUOTE.CONVERT,
   ],
   // VIEWER: salt okuma (hassas finansal okuma HARİÇ).
   [ROLE_NAMES.VIEWER]: [
@@ -172,5 +207,7 @@ export const DEFAULT_ROLE_PERMISSIONS: Record<string, string[]> = {
     PERMISSIONS.LEAD.READ,
     PERMISSIONS.MEETING.READ,
     PERMISSIONS.CUSTOM_FIELD.READ,
+    PERMISSIONS.PRODUCT.READ,
+    PERMISSIONS.QUOTE.READ,
   ],
 };

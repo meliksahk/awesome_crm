@@ -14,6 +14,8 @@ export function Sidebar() {
         {can('deal.read') && <NavItem href="/deals" label="Anlaşmalar" />}
         {can('contact.read') && <NavItem href="/contacts" label="Kişiler" />}
         {can('company.read') && <NavItem href="/companies" label="Şirketler" />}
+        {can('product.read') && <NavItem href="/products" label="Ürünler" />}
+        {can('quote.read') && <NavItem href="/quotes" label="Teklifler" />}
         {can('invoice.read') && <NavItem href="/invoices" label="Faturalar" />}
         {can('deal.read') && <NavItem href="/reports" label="Raporlar" />}
         {can('ai.use') && <NavItem href="/ai" label="AI Asistan" />}

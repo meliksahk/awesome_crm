@@ -136,6 +136,7 @@ model Deal {
   owner        User?          @relation("DealOwner", fields: [ownerId], references: [id])
   activities   DealActivity[]
   invoices     Invoice[]
+  quotes       Quote[]
   // Faz 6 multi-tenancy: nullable (kademeli geçiş). Bağlam aktifse otomatik atanır/filtrelenir.
   tenantId     String?
   createdAt    DateTime       @default(now())
@@ -229,6 +230,83 @@ model Payment {
 
 // Yıl bazlı sıralı fatura numarası sayacı (atlamasız üretim için).
 model InvoiceCounter {
+  year       Int @id
+  lastNumber Int @default(0)
+}
+
+// ===== v2.7 — Ürün & Teklif (CPQ) =====
+
+model Product {
+  id          String          @id @default(uuid())
+  sku         String?         @unique
+  name        String
+  description String?
+  unitPrice   Decimal         @db.Decimal(14, 2)
+  currency    String          @default("TRY")
+  taxRate     Decimal         @default(0) @db.Decimal(5, 2) // % varsayılan KDV
+  active      Boolean         @default(true)
+  tenantId    String?
+  deletedAt   DateTime? // soft delete (hard delete yok)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  quoteItems  QuoteLineItem[]
+
+  @@index([active])
+  @@index([tenantId])
+}
+
+enum QuoteStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REJECTED
+  EXPIRED
+  CONVERTED
+}
+
+model Quote {
+  id                 String          @id @default(uuid())
+  number             String?         @unique // QUO-2026-000123 (send'de atanır)
+  dealId             String?
+  customerName       String
+  customerEmail      String?
+  status             QuoteStatus     @default(DRAFT)
+  currency           String          @default("TRY")
+  subtotal           Decimal         @db.Decimal(14, 2)
+  taxRate            Decimal         @db.Decimal(5, 2)
+  taxAmount          Decimal         @db.Decimal(14, 2)
+  total              Decimal         @db.Decimal(14, 2)
+  validUntil         DateTime?
+  convertedInvoiceId String?         @unique // dönüştürülen fatura (idempotency)
+  deal               Deal?           @relation(fields: [dealId], references: [id])
+  lineItems          QuoteLineItem[]
+  createdById        String
+  tenantId           String?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  @@index([status])
+  @@index([dealId])
+  @@index([tenantId])
+}
+
+model QuoteLineItem {
+  id          String   @id @default(uuid())
+  quoteId     String
+  productId   String?
+  description String
+  quantity    Decimal  @db.Decimal(12, 3)
+  unitPrice   Decimal  @db.Decimal(14, 2)
+  lineTotal   Decimal  @db.Decimal(14, 2)
+  quote       Quote    @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  product     Product? @relation(fields: [productId], references: [id])
+
+  @@index([quoteId])
+  @@index([productId])
+}
+
+// Yıl bazlı sıralı teklif numarası sayacı.
+model QuoteCounter {
   year       Int @id
   lastNumber Int @default(0)
 }

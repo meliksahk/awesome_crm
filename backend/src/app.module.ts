@@ -27,6 +27,8 @@ import { AutomationModule } from './modules/automation/automation.module';
 import { ReportsModule } from './modules/reports/reports.module';
 import { CustomFieldsModule } from './modules/custom-fields/custom-fields.module';
 import { AiModule } from './modules/ai/ai.module';
+import { ProductsModule } from './modules/products/products.module';
+import { QuotesModule } from './modules/quotes/quotes.module';
 import { TenantMiddleware } from './common/tenant/tenant.middleware';
 
 @Module({
@@ -62,6 +64,8 @@ import { TenantMiddleware } from './common/tenant/tenant.middleware';
     ReportsModule,
     CustomFieldsModule,
     AiModule,
+    ProductsModule,
+    QuotesModule,
   ],
   providers: [
     // Guard sırası önemli: kimlik → rol → izin (her biri bir öncekine dayanır).

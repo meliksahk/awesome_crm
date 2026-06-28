@@ -28,4 +28,6 @@ export const TENANT_MODELS = new Set<string>([
   'Lead',
   'Meeting',
   'AutomationRule',
+  'Product',
+  'Quote',
 ]);

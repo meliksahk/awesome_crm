@@ -37,8 +37,14 @@ disiplini korunur.
   client `null` → uçlar 503, `status.enabled:false` (uygulama yine açılır).
   Test: 8 unit (mock client + no-key 503 + refusal), 5 e2e (status/yetki/503).
 
-## V2.7 — Ürün + Teklif/CPQ
-- `Product`, `Quote` (kalemler) → mevcut `Invoice`'a dönüştür.
+## V2.7 — Ürün + Teklif/CPQ — ✅ TAMAM
+- `Product` kataloğu (CRUD, soft delete, SKU benzersiz) + `Quote` (kalemler,
+  productId çözümleme, sunucu Decimal toplam, `QuoteStatus` yaşam döngüsü).
+- Uçlar: `/products` CRUD, `/quotes` CRUD + `send` (QUO-yıl-seq numara) +
+  `accept`/`reject` + `convert` → DRAFT `Invoice` (tek transaction, idempotent;
+  çift dönüşüm 409). İzinler `product.*`/`quote.*`; tenant kapsamı eklendi.
+- Frontend: Ürünler + Teklifler sayfaları (liste/oluştur, gönder/faturala).
+- Test: 11 unit + 6 e2e (CPQ akışı: ürün→teklif→gönder→faturala→çift dönüşüm).
 
 ## V2.8 — Entegrasyon & veri
 - CSV import/export, dedup/merge.
