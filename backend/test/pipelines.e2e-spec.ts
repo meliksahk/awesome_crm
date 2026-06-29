@@ -84,7 +84,8 @@ describe('Pipelines / stages (e2e)', () => {
       })
       .expect(201);
     testUserIds.push(res.body.data.id);
-    salesToken = (await login(salesEmail, pw).expect(200)).body.data.accessToken;
+    salesToken = (await login(salesEmail, pw).expect(200)).body.data
+      .accessToken;
 
     const list = await request(app.getHttpServer())
       .get(`${base}/pipelines`)

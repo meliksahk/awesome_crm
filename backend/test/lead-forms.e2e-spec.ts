@@ -79,7 +79,8 @@ describe('Lead intake forms + webhook (e2e)', () => {
       })
       .expect(201);
     testUserIds.push(res.body.data.id);
-    salesToken = (await login(salesEmail, pw).expect(200)).body.data.accessToken;
+    salesToken = (await login(salesEmail, pw).expect(200)).body.data
+      .accessToken;
   });
 
   afterAll(async () => {
@@ -158,9 +159,9 @@ describe('Lead intake forms + webhook (e2e)', () => {
     });
     expect(lead?.channel).toBe('FORM');
     expect(lead?.formId).toBe(formId);
-    expect((lead?.meta as { fields?: Record<string, unknown> })?.fields).toEqual(
-      { utm_campaign: 'spring' },
-    );
+    expect(
+      (lead?.meta as { fields?: Record<string, unknown> })?.fields,
+    ).toEqual({ utm_campaign: 'spring' });
   });
 
   it('WEBHOOK geçerli HMAC → 200, WEBHOOK kanalı lead üretir', async () => {
@@ -222,8 +223,8 @@ describe('Lead intake forms + webhook (e2e)', () => {
     const channels = r.body.data.map((l: { channel: string }) => l.channel);
     expect(channels.every((c: string) => c === 'FORM')).toBe(true);
     expect(
-      r.body.data.some((l: { firstName: string }) =>
-        l.firstName === `FormLead_${ts}`,
+      r.body.data.some(
+        (l: { firstName: string }) => l.firstName === `FormLead_${ts}`,
       ),
     ).toBe(true);
   });

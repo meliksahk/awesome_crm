@@ -62,7 +62,7 @@ export class PipelinesService {
       !dto.stageIds.every((id) => currentIds.has(id))
     ) {
       throw new BadRequestException(
-        'stageIds bu pipeline\'ın tüm stage\'lerini birebir içermeli.',
+        "stageIds bu pipeline'ın tüm stage'lerini birebir içermeli.",
       );
     }
     return this.repo.reorder(pipelineId, dto.stageIds);
