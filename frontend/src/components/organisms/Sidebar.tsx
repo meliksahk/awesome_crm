@@ -15,6 +15,9 @@ export function Sidebar() {
       <nav className="space-y-1">
         <NavItem href="/" label={t('nav.dashboard')} />
         {can('lead.read') && <NavItem href="/leads" label={t('nav.leads')} />}
+        {can('lead_form.read') && (
+          <NavItem href="/lead-forms" label={t('nav.leadForms')} />
+        )}
         {can('deal.read') && <NavItem href="/deals" label={t('nav.deals')} />}
         {can('contact.read') && (
           <NavItem href="/contacts" label={t('nav.contacts')} />

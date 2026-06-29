@@ -21,6 +21,24 @@ const tone: Record<string, 'gray' | 'blue' | 'green' | 'amber' | 'red'> = {
   CONVERTED: 'gray',
 };
 
+const channelTone: Record<string, 'gray' | 'blue' | 'green' | 'amber' | 'red'> =
+  {
+    MANUAL: 'gray',
+    IMPORT: 'amber',
+    FORM: 'green',
+    WEBHOOK: 'blue',
+    API: 'gray',
+  };
+
+const CHANNELS = ['MANUAL', 'IMPORT', 'FORM', 'WEBHOOK', 'API'] as const;
+const channelKey: Record<string, string> = {
+  MANUAL: 'lead.chManual',
+  IMPORT: 'lead.chImport',
+  FORM: 'lead.chForm',
+  WEBHOOK: 'lead.chWebhook',
+  API: 'lead.chApi',
+};
+
 const BASE: CrudField[] = [
   { key: 'firstName', label: 'field.firstName', required: true },
   { key: 'lastName', label: 'field.lastName', required: true },
@@ -46,13 +64,21 @@ export default function LeadsPage() {
   const qc = useQueryClient();
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<UnqualifiedLead | null>(null);
+  const [fChannel, setFChannel] = useState('');
+  const [fStatus, setFStatus] = useState('');
+  const [fSource, setFSource] = useState('');
 
   const leads = useQuery({
-    queryKey: ['leads'],
-    queryFn: async () =>
-      unwrap<UnqualifiedLead[]>(
-        (await api.get('/leads', { params: { limit: 50 } })).data,
-      ),
+    queryKey: ['leads', fChannel, fStatus, fSource],
+    queryFn: async () => {
+      const params: Record<string, string | number> = { limit: 50 };
+      if (fChannel) params.channel = fChannel;
+      if (fStatus) params.status = fStatus;
+      if (fSource) params.source = fSource;
+      return unwrap<UnqualifiedLead[]>(
+        (await api.get('/leads', { params })).data,
+      );
+    },
   });
   const invalidate = () => qc.invalidateQueries({ queryKey: ['leads'] });
 
@@ -65,6 +91,15 @@ export default function LeadsPage() {
     { key: 'name', header: t('col.name'), render: (r) => `${r.firstName} ${r.lastName}` },
     { key: 'company', header: t('col.company'), render: (r) => r.companyName ?? '—' },
     { key: 'source', header: t('col.source'), render: (r) => r.source ?? '—' },
+    {
+      key: 'channel',
+      header: t('col.channel'),
+      render: (r) => (
+        <Badge tone={channelTone[r.channel] ?? 'gray'}>
+          {t(channelKey[r.channel] ?? 'lead.chManual')}
+        </Badge>
+      ),
+    },
     {
       key: 'status',
       header: t('col.status'),
@@ -92,11 +127,49 @@ export default function LeadsPage() {
 
   return (
     <DashboardTemplate title="page.leads">
-      {can('lead.create') && (
-        <div className="mb-4">
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        {can('lead.create') && (
           <Button onClick={() => setCreating(true)}>{t('btn.newLead')}</Button>
-        </div>
-      )}
+        )}
+        <select
+          value={fChannel}
+          onChange={(e) => setFChannel(e.target.value)}
+          className="rounded-md border border-gray-300 px-2 py-1.5 text-sm"
+          aria-label={t('lead.filterChannel')}
+        >
+          <option value="">
+            {t('lead.filterChannel')}: {t('common.all')}
+          </option>
+          {CHANNELS.map((c) => (
+            <option key={c} value={c}>
+              {t(channelKey[c])}
+            </option>
+          ))}
+        </select>
+        <select
+          value={fStatus}
+          onChange={(e) => setFStatus(e.target.value)}
+          className="rounded-md border border-gray-300 px-2 py-1.5 text-sm"
+          aria-label={t('field.status')}
+        >
+          <option value="">
+            {t('field.status')}: {t('common.all')}
+          </option>
+          {['NEW', 'WORKING', 'QUALIFIED', 'UNQUALIFIED', 'CONVERTED'].map(
+            (s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ),
+          )}
+        </select>
+        <input
+          value={fSource}
+          onChange={(e) => setFSource(e.target.value)}
+          placeholder={t('lead.filterSource')}
+          className="rounded-md border border-gray-300 px-2 py-1.5 text-sm"
+        />
+      </div>
 
       {leads.isLoading ? (
         <Spinner />

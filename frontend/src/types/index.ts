@@ -60,6 +60,8 @@ export interface User {
   roles: string[];
 }
 
+export type LeadChannel = 'MANUAL' | 'IMPORT' | 'FORM' | 'WEBHOOK' | 'API';
+
 export interface UnqualifiedLead {
   id: string;
   firstName: string;
@@ -68,7 +70,31 @@ export interface UnqualifiedLead {
   phone: string | null;
   companyName: string | null;
   source: string | null;
+  channel: LeadChannel;
+  formId: string | null;
   status: 'NEW' | 'WORKING' | 'QUALIFIED' | 'UNQUALIFIED' | 'CONVERTED';
+}
+
+export interface LeadFormField {
+  key: string;
+  label: string;
+  type?: string;
+  required?: boolean;
+}
+
+export interface LeadForm {
+  id: string;
+  name: string;
+  publicKey: string;
+  secret?: string; // yalnız oluşturma yanıtında / reveal'da
+  fields: LeadFormField[];
+  buttonColor: string;
+  buttonLabel: string;
+  successMessage: string | null;
+  redirectUrl: string | null;
+  isActive: boolean;
+  submitCount: number;
+  createdAt: string;
 }
 
 export interface Company {
