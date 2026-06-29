@@ -31,6 +31,12 @@ export default function DashboardHome() {
     enabled: can('user.read'),
   });
 
+  // Yalnız yetkili (enabled) sorgular yüklenirken spinner göster.
+  const anyLoading =
+    (can('deal.read') && deals.isLoading) ||
+    (can('invoice.read') && invoices.isLoading) ||
+    (can('user.read') && users.isLoading);
+
   return (
     <DashboardTemplate title="Panel">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -62,8 +68,13 @@ export default function DashboardHome() {
         </p>
       )}
       <div className="mt-6 flex items-center gap-2 text-xs text-gray-400">
-        <Spinner className="h-3 w-3" /> Veriler canlı API&apos;den
-        (`/api/v1`) çekiliyor.
+        {anyLoading ? (
+          <>
+            <Spinner className="h-3 w-3" /> Veriler çekiliyor…
+          </>
+        ) : (
+          <>Veriler güncel (canlı API: /api/v1).</>
+        )}
       </div>
     </DashboardTemplate>
   );
