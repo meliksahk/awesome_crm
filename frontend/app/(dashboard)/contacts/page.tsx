@@ -1,9 +1,10 @@
 'use client';
-// app/(dashboard)/contacts/page.tsx — kişi tam CRUD (şirket seçicili).
+// app/(dashboard)/contacts/page.tsx — kişi tam CRUD (şirket seçicili, i18n).
 import { useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, unwrap } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { useI18n } from '@/lib/i18n';
 import { DashboardTemplate } from '@/components/templates/DashboardTemplate';
 import { DataTable, Column } from '@/components/organisms/DataTable';
 import { CrudFormModal, CrudField } from '@/components/organisms/CrudFormModal';
@@ -13,6 +14,7 @@ import type { Company, Contact } from '@/types';
 
 export default function ContactsPage() {
   const { can } = useAuth();
+  const { t } = useI18n();
   const qc = useQueryClient();
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<Contact | null>(null);
@@ -37,14 +39,14 @@ export default function ContactsPage() {
   const invalidate = () => qc.invalidateQueries({ queryKey: ['contacts'] });
 
   const fields: CrudField[] = [
-    { key: 'firstName', label: 'Ad', required: true },
-    { key: 'lastName', label: 'Soyad', required: true },
-    { key: 'email', label: 'E-posta', type: 'email' },
-    { key: 'phone', label: 'Telefon', type: 'phone' },
-    { key: 'title', label: 'Ünvan' },
+    { key: 'firstName', label: 'field.firstName', required: true },
+    { key: 'lastName', label: 'field.lastName', required: true },
+    { key: 'email', label: 'field.email', type: 'email' },
+    { key: 'phone', label: 'field.phone', type: 'phone' },
+    { key: 'title', label: 'field.title' },
     {
       key: 'companyId',
-      label: 'Şirket',
+      label: 'field.company',
       type: 'select',
       options: (companies.data ?? []).map((c) => ({
         value: c.id,
@@ -54,17 +56,17 @@ export default function ContactsPage() {
   ];
 
   const columns: Column<Contact>[] = [
-    { key: 'name', header: 'Ad', render: (r) => `${r.firstName} ${r.lastName}` },
-    { key: 'email', header: 'E-posta', render: (r) => r.email ?? '—' },
-    { key: 'title', header: 'Ünvan', render: (r) => r.title ?? '—' },
-    { key: 'company', header: 'Şirket', render: (r) => r.company?.name ?? '—' },
+    { key: 'name', header: t('col.name'), render: (r) => `${r.firstName} ${r.lastName}` },
+    { key: 'email', header: t('col.email'), render: (r) => r.email ?? '—' },
+    { key: 'title', header: t('col.title'), render: (r) => r.title ?? '—' },
+    { key: 'company', header: t('col.company'), render: (r) => r.company?.name ?? '—' },
   ];
 
   return (
     <DashboardTemplate title="page.contacts">
       {can('contact.create') && (
         <div className="mb-4">
-          <Button onClick={() => setCreating(true)}>+ Yeni kişi</Button>
+          <Button onClick={() => setCreating(true)}>{t('btn.newContact')}</Button>
         </div>
       )}
 
@@ -74,16 +76,16 @@ export default function ContactsPage() {
         <DataTable
           columns={columns}
           rows={contacts.data ?? []}
-          empty="Kişi yok"
+          empty={t('common.empty')}
           onRowClick={can('contact.update') ? setEditing : undefined}
         />
       )}
 
       {creating && (
         <CrudFormModal
-          title="Yeni kişi"
+          title={t('m.newContact')}
           fields={fields}
-          submitLabel="Oluştur"
+          submitLabel={t('common.create')}
           onClose={() => setCreating(false)}
           onSubmit={async (v) => {
             await api.post('/contacts', v);
@@ -94,7 +96,7 @@ export default function ContactsPage() {
 
       {editing && (
         <CrudFormModal
-          title="Kişiyi düzenle"
+          title={t('m.editContact')}
           fields={fields}
           initial={{
             firstName: editing.firstName,

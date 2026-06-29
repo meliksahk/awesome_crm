@@ -1,9 +1,10 @@
 'use client';
-// app/(dashboard)/products/page.tsx — ürün tam CRUD.
+// app/(dashboard)/products/page.tsx — ürün tam CRUD (i18n).
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, unwrap } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { useI18n } from '@/lib/i18n';
 import { DashboardTemplate } from '@/components/templates/DashboardTemplate';
 import { DataTable, Column } from '@/components/organisms/DataTable';
 import { CrudFormModal, CrudField } from '@/components/organisms/CrudFormModal';
@@ -23,16 +24,17 @@ interface Product {
 }
 
 const FIELDS: CrudField[] = [
-  { key: 'name', label: 'Ad', required: true },
-  { key: 'sku', label: 'SKU' },
-  { key: 'unitPrice', label: 'Birim fiyat', type: 'number', required: true, placeholder: '1000.00' },
-  { key: 'currency', label: 'Para birimi', placeholder: 'TRY' },
-  { key: 'taxRate', label: 'KDV %', type: 'number', placeholder: '20' },
-  { key: 'description', label: 'Açıklama', type: 'textarea' },
+  { key: 'name', label: 'field.name', required: true },
+  { key: 'sku', label: 'field.sku' },
+  { key: 'unitPrice', label: 'field.unitPrice', type: 'number', required: true, placeholder: '1000.00' },
+  { key: 'currency', label: 'field.currency', placeholder: 'TRY' },
+  { key: 'taxRate', label: 'field.taxRate', type: 'number', placeholder: '20' },
+  { key: 'description', label: 'field.description', type: 'textarea' },
 ];
 
 export default function ProductsPage() {
   const { can } = useAuth();
+  const { t } = useI18n();
   const qc = useQueryClient();
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
@@ -47,20 +49,20 @@ export default function ProductsPage() {
   const invalidate = () => qc.invalidateQueries({ queryKey: ['products'] });
 
   const columns: Column<Product>[] = [
-    { key: 'name', header: 'Ürün', render: (r) => r.name },
-    { key: 'sku', header: 'SKU', render: (r) => r.sku ?? '—' },
+    { key: 'name', header: t('col.product'), render: (r) => r.name },
+    { key: 'sku', header: t('col.sku'), render: (r) => r.sku ?? '—' },
     {
       key: 'unitPrice',
-      header: 'Birim fiyat',
+      header: t('col.unitPrice'),
       render: (r) => `${r.unitPrice} ${r.currency}`,
     },
-    { key: 'taxRate', header: 'KDV %', render: (r) => r.taxRate },
+    { key: 'taxRate', header: t('col.taxRate'), render: (r) => r.taxRate },
     {
       key: 'active',
-      header: 'Durum',
+      header: t('col.status'),
       render: (r) => (
         <Badge tone={r.active ? 'green' : 'gray'}>
-          {r.active ? 'Aktif' : 'Pasif'}
+          {r.active ? t('s.active') : t('s.passive')}
         </Badge>
       ),
     },
@@ -70,7 +72,7 @@ export default function ProductsPage() {
     <DashboardTemplate title="page.products">
       {can('product.create') && (
         <div className="mb-4">
-          <Button onClick={() => setCreating(true)}>+ Yeni ürün</Button>
+          <Button onClick={() => setCreating(true)}>{t('btn.newProduct')}</Button>
         </div>
       )}
 
@@ -80,16 +82,16 @@ export default function ProductsPage() {
         <DataTable
           columns={columns}
           rows={products.data ?? []}
-          empty="Ürün yok"
+          empty={t('common.empty')}
           onRowClick={can('product.update') ? setEditing : undefined}
         />
       )}
 
       {creating && (
         <CrudFormModal
-          title="Yeni ürün"
+          title={t('m.newProduct')}
           fields={FIELDS}
-          submitLabel="Oluştur"
+          submitLabel={t('common.create')}
           onClose={() => setCreating(false)}
           onSubmit={async (v) => {
             await api.post('/products', v);
@@ -100,7 +102,7 @@ export default function ProductsPage() {
 
       {editing && (
         <CrudFormModal
-          title="Ürünü düzenle"
+          title={t('m.editProduct')}
           fields={FIELDS}
           initial={{
             name: editing.name,

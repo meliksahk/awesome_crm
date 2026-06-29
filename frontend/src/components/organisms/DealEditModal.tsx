@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { useI18n } from '@/lib/i18n';
 import { Modal } from '../molecules/Modal';
 import { FormField } from '../molecules/FormField';
 import { PhoneNumberField } from '../atoms/PhoneNumberField';
@@ -20,6 +21,7 @@ export function DealEditModal({
   onClose: () => void;
 }) {
   const { can } = useAuth();
+  const { t } = useI18n();
   const qc = useQueryClient();
   const [form, setForm] = useState({
     title: deal.title ?? '',
@@ -69,56 +71,56 @@ export function DealEditModal({
   });
 
   return (
-    <Modal title="Anlaşmayı düzenle" onClose={onClose}>
+    <Modal title={t('deal.editTitle')} onClose={onClose}>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <FormField
           id="e-title"
-          label="Başlık *"
+          label={`${t('field.subject')} *`}
           value={form.title}
           onChange={(e) => set('title', e.target.value)}
         />
         <FormField
           id="e-company"
-          label="Şirket"
+          label={t('field.company')}
           value={form.company}
           onChange={(e) => set('company', e.target.value)}
         />
         <FormField
           id="e-value"
-          label="Değer"
+          label={t('field.value')}
           placeholder="12000.50"
           value={form.value}
           onChange={(e) => set('value', e.target.value)}
         />
         <FormField
           id="e-currency"
-          label="Para birimi"
+          label={t('field.currency')}
           maxLength={3}
           value={form.currency}
           onChange={(e) => set('currency', e.target.value.toUpperCase())}
         />
         <FormField
           id="e-contact"
-          label="İlgili kişi"
+          label={t('field.contactName')}
           value={form.contactName}
           onChange={(e) => set('contactName', e.target.value)}
         />
         <FormField
           id="e-email"
-          label="E-posta"
+          label={t('field.email')}
           type="email"
           value={form.email}
           onChange={(e) => set('email', e.target.value)}
         />
         <PhoneNumberField
           id="e-phone"
-          label="Telefon"
+          label={t('field.phone')}
           value={form.phone}
           onChange={(v) => set('phone', v)}
         />
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-600">
-            Aşama
+            {t('field.stage')}
           </label>
           <select
             value={stageId}
@@ -140,10 +142,10 @@ export function DealEditModal({
             disabled={!form.title.trim() || save.isPending}
             onClick={() => save.mutate()}
           >
-            {save.isPending ? 'Kaydediliyor…' : 'Kaydet'}
+            {save.isPending ? '…' : t('common.save')}
           </Button>
           <Button variant="ghost" onClick={onClose}>
-            Vazgeç
+            {t('common.cancel')}
           </Button>
         </div>
         {can('deal.delete') && (
@@ -151,21 +153,18 @@ export function DealEditModal({
             variant="danger"
             disabled={remove.isPending}
             onClick={() => {
-              if (confirm('Bu anlaşmayı silmek istediğinize emin misiniz?')) {
+              if (confirm(`${t('common.delete')}?`)) {
                 remove.mutate();
               }
             }}
           >
-            {remove.isPending ? 'Siliniyor…' : 'Sil'}
+            {remove.isPending ? '…' : t('common.delete')}
           </Button>
         )}
       </div>
 
       {(save.isError || remove.isError) && (
-        <p className="mt-2 text-sm text-red-600">
-          İşlem başarısız — alanları kontrol edin (değer sayısal, e-posta geçerli)
-          ya da yetkinizi doğrulayın.
-        </p>
+        <p className="mt-2 text-sm text-red-600">{t('common.error')}</p>
       )}
     </Modal>
   );

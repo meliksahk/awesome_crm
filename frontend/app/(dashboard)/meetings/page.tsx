@@ -1,9 +1,10 @@
 'use client';
-// app/(dashboard)/meetings/page.tsx — toplantı tam CRUD.
+// app/(dashboard)/meetings/page.tsx — toplantı tam CRUD (i18n).
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, unwrap } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { useI18n } from '@/lib/i18n';
 import { DashboardTemplate } from '@/components/templates/DashboardTemplate';
 import { DataTable, Column } from '@/components/organisms/DataTable';
 import { CrudFormModal, CrudField } from '@/components/organisms/CrudFormModal';
@@ -20,11 +21,11 @@ interface Meeting {
 }
 
 const FIELDS: CrudField[] = [
-  { key: 'title', label: 'Başlık', required: true },
-  { key: 'startsAt', label: 'Başlangıç', type: 'datetime', required: true },
-  { key: 'endsAt', label: 'Bitiş', type: 'datetime', required: true },
-  { key: 'location', label: 'Konum' },
-  { key: 'notes', label: 'Notlar', type: 'textarea' },
+  { key: 'title', label: 'field.subject', required: true },
+  { key: 'startsAt', label: 'field.startsAt', type: 'datetime', required: true },
+  { key: 'endsAt', label: 'field.endsAt', type: 'datetime', required: true },
+  { key: 'location', label: 'field.location' },
+  { key: 'notes', label: 'field.notes', type: 'textarea' },
 ];
 
 // ISO → datetime-local ('YYYY-MM-DDTHH:mm', yerel saat)
@@ -35,10 +36,11 @@ const toLocal = (iso: string) => {
     d.getHours(),
   )}:${p(d.getMinutes())}`;
 };
-const fmt = (iso: string) => new Date(iso).toLocaleString('tr-TR');
+const fmt = (iso: string) => new Date(iso).toLocaleString();
 
 export default function MeetingsPage() {
   const { can } = useAuth();
+  const { t } = useI18n();
   const qc = useQueryClient();
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<Meeting | null>(null);
@@ -53,17 +55,17 @@ export default function MeetingsPage() {
   const invalidate = () => qc.invalidateQueries({ queryKey: ['meetings'] });
 
   const columns: Column<Meeting>[] = [
-    { key: 'title', header: 'Başlık', render: (r) => r.title },
-    { key: 'startsAt', header: 'Başlangıç', render: (r) => fmt(r.startsAt) },
-    { key: 'endsAt', header: 'Bitiş', render: (r) => fmt(r.endsAt) },
-    { key: 'location', header: 'Konum', render: (r) => r.location ?? '—' },
+    { key: 'title', header: t('field.subject'), render: (r) => r.title },
+    { key: 'startsAt', header: t('field.startsAt'), render: (r) => fmt(r.startsAt) },
+    { key: 'endsAt', header: t('field.endsAt'), render: (r) => fmt(r.endsAt) },
+    { key: 'location', header: t('field.location'), render: (r) => r.location ?? '—' },
   ];
 
   return (
     <DashboardTemplate title="page.meetings">
       {can('meeting.create') && (
         <div className="mb-4">
-          <Button onClick={() => setCreating(true)}>+ Yeni toplantı</Button>
+          <Button onClick={() => setCreating(true)}>{t('btn.newMeeting')}</Button>
         </div>
       )}
 
@@ -73,16 +75,16 @@ export default function MeetingsPage() {
         <DataTable
           columns={columns}
           rows={meetings.data ?? []}
-          empty="Toplantı yok"
+          empty={t('common.empty')}
           onRowClick={can('meeting.update') ? setEditing : undefined}
         />
       )}
 
       {creating && (
         <CrudFormModal
-          title="Yeni toplantı"
+          title={t('m.newMeeting')}
           fields={FIELDS}
-          submitLabel="Oluştur"
+          submitLabel={t('common.create')}
           onClose={() => setCreating(false)}
           onSubmit={async (v) => {
             await api.post('/meetings', v);
@@ -93,7 +95,7 @@ export default function MeetingsPage() {
 
       {editing && (
         <CrudFormModal
-          title="Toplantıyı düzenle"
+          title={t('m.editMeeting')}
           fields={FIELDS}
           initial={{
             title: editing.title,

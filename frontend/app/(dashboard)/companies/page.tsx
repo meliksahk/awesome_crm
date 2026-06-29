@@ -1,9 +1,10 @@
 'use client';
-// app/(dashboard)/companies/page.tsx — şirket tam CRUD.
+// app/(dashboard)/companies/page.tsx — şirket tam CRUD (i18n).
 import { useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, unwrap } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { useI18n } from '@/lib/i18n';
 import { DashboardTemplate } from '@/components/templates/DashboardTemplate';
 import { DataTable, Column } from '@/components/organisms/DataTable';
 import { CrudFormModal, CrudField } from '@/components/organisms/CrudFormModal';
@@ -13,15 +14,16 @@ import { Button } from '@/components/atoms/Button';
 import type { Company } from '@/types';
 
 const FIELDS: CrudField[] = [
-  { key: 'name', label: 'Ad', required: true },
-  { key: 'domain', label: 'Alan adı', placeholder: 'firma.com' },
-  { key: 'industry', label: 'Sektör' },
-  { key: 'phone', label: 'Telefon', type: 'phone' },
-  { key: 'website', label: 'Web sitesi', placeholder: 'https://…' },
+  { key: 'name', label: 'field.name', required: true },
+  { key: 'domain', label: 'field.domain', placeholder: 'firma.com' },
+  { key: 'industry', label: 'field.industry' },
+  { key: 'phone', label: 'field.phone', type: 'phone' },
+  { key: 'website', label: 'field.website', placeholder: 'https://…' },
 ];
 
 export default function CompaniesPage() {
   const { can } = useAuth();
+  const { t } = useI18n();
   const qc = useQueryClient();
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<Company | null>(null);
@@ -36,12 +38,12 @@ export default function CompaniesPage() {
   const invalidate = () => qc.invalidateQueries({ queryKey: ['companies'] });
 
   const columns: Column<Company>[] = [
-    { key: 'name', header: 'Şirket', render: (r) => r.name },
-    { key: 'domain', header: 'Alan adı', render: (r) => r.domain ?? '—' },
-    { key: 'industry', header: 'Sektör', render: (r) => r.industry ?? '—' },
+    { key: 'name', header: t('col.company'), render: (r) => r.name },
+    { key: 'domain', header: t('col.domain'), render: (r) => r.domain ?? '—' },
+    { key: 'industry', header: t('col.industry'), render: (r) => r.industry ?? '—' },
     {
       key: 'contacts',
-      header: 'Kişi',
+      header: t('col.contactsCount'),
       render: (r) => <Badge tone="indigo">{r.contactCount}</Badge>,
     },
   ];
@@ -50,7 +52,7 @@ export default function CompaniesPage() {
     <DashboardTemplate title="page.companies">
       {can('company.create') && (
         <div className="mb-4">
-          <Button onClick={() => setCreating(true)}>+ Yeni şirket</Button>
+          <Button onClick={() => setCreating(true)}>{t('btn.newCompany')}</Button>
         </div>
       )}
 
@@ -60,16 +62,16 @@ export default function CompaniesPage() {
         <DataTable
           columns={columns}
           rows={companies.data ?? []}
-          empty="Şirket yok"
+          empty={t('common.empty')}
           onRowClick={can('company.update') ? setEditing : undefined}
         />
       )}
 
       {creating && (
         <CrudFormModal
-          title="Yeni şirket"
+          title={t('m.newCompany')}
           fields={FIELDS}
-          submitLabel="Oluştur"
+          submitLabel={t('common.create')}
           onClose={() => setCreating(false)}
           onSubmit={async (v) => {
             await api.post('/companies', v);
@@ -80,7 +82,7 @@ export default function CompaniesPage() {
 
       {editing && (
         <CrudFormModal
-          title="Şirketi düzenle"
+          title={t('m.editCompany')}
           fields={FIELDS}
           initial={{
             name: editing.name,

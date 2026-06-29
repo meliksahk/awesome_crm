@@ -111,7 +111,7 @@ export function CrudFormModal({
             {f.type === 'select' ? (
               <>
                 <label className="mb-1 block text-sm font-medium text-gray-600">
-                  {f.label}
+                  {t(f.label)}
                   {f.required ? ' *' : ''}
                 </label>
                 <select
@@ -130,7 +130,7 @@ export function CrudFormModal({
             ) : f.type === 'textarea' ? (
               <>
                 <label className="mb-1 block text-sm font-medium text-gray-600">
-                  {f.label}
+                  {t(f.label)}
                 </label>
                 <Textarea
                   rows={3}
@@ -141,14 +141,14 @@ export function CrudFormModal({
             ) : f.type === 'phone' ? (
               <PhoneNumberField
                 id={`cf-${f.key}`}
-                label={f.label + (f.required ? ' *' : '')}
+                label={t(f.label) + (f.required ? ' *' : '')}
                 value={vals[f.key]}
                 onChange={(v) => set(f.key, v)}
               />
             ) : (
               <FormField
                 id={`cf-${f.key}`}
-                label={f.label + (f.required ? ' *' : '')}
+                label={t(f.label) + (f.required ? ' *' : '')}
                 type={inputType(f.type)}
                 placeholder={f.placeholder}
                 value={vals[f.key]}
