@@ -66,7 +66,12 @@ export class ReportsRepository {
   nonCancelledInvoices() {
     return this.prisma.invoice.findMany({
       where: { status: { not: InvoiceStatus.CANCELLED } },
-      select: { total: true, amountPaid: true, issuedAt: true, createdAt: true },
+      select: {
+        total: true,
+        amountPaid: true,
+        issuedAt: true,
+        createdAt: true,
+      },
     });
   }
 

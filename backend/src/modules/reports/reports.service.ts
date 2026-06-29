@@ -174,8 +174,10 @@ export class ReportsService {
     >();
     for (const l of lines) {
       if (!l.productId) continue;
-      const row =
-        map.get(l.productId) ?? { revenue: new D(0), quantity: new D(0) };
+      const row = map.get(l.productId) ?? {
+        revenue: new D(0),
+        quantity: new D(0),
+      };
       row.revenue = row.revenue.plus(l.lineTotal);
       row.quantity = row.quantity.plus(l.quantity);
       map.set(l.productId, row);
