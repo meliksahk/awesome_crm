@@ -356,6 +356,39 @@ export const en: Dict = {
   'embed.thanks': 'Thank you! Your submission was received.',
   'embed.error': 'Submission failed. Please try again.',
   'embed.notFound': 'Form not found or inactive.',
+  // Pipeline / stage management
+  'nav.pipeline': 'Pipeline (stages)',
+  'page.pipeline': 'Pipeline & stages',
+  'stage.add': '+ Add stage',
+  'stage.namePh': 'Stage name',
+  'stage.won': 'Won',
+  'stage.lost': 'Lost',
+  'stage.up': 'Move left',
+  'stage.down': 'Move right',
+  'stage.deleteConfirm': 'Delete this stage?',
+  'stage.deleteBlocked':
+    'Cannot delete: the stage has deals (incl. archived) or is the last one.',
+  'stage.hint':
+    'Stages are the Kanban columns. Add, rename, reorder or remove them; “Won/Lost” mark closing columns.',
+  // Webhook (outbound integrations) management
+  'nav.integrations': 'Webhooks',
+  'page.integrations': 'Webhooks (integrations)',
+  'wh.new': '+ New webhook',
+  'wh.url': 'Endpoint URL (https)',
+  'wh.events': 'Events',
+  'wh.test': 'Send test',
+  'wh.deliveries': 'Deliveries',
+  'wh.noDeliveries': 'No deliveries yet.',
+  'wh.secretOnce':
+    'Signing secret — shown once. Store it on the receiving side to verify signatures.',
+  'wh.deleteConfirm': 'Delete this webhook?',
+  'wh.howTitle': 'How to receive & verify (HMAC)',
+  'wh.howBody':
+    'We POST the event JSON to your URL with headers x-crm-signature and x-crm-timestamp. Verify: expected = "sha256=" + HMAC-SHA256(secret, `${timestamp}.${rawBody}`), compared constant-time, within a ±5 min window. Reject if it does not match.',
+  'wh.inboundNote':
+    'Receiving leads FROM other systems? Configure inbound (signed) lead webhooks per form on the Lead forms page.',
+  'col.events': 'Events',
+  'col.created': 'Created',
 };
 
 // --- Türkçe ---
@@ -695,6 +728,39 @@ export const tr: Dict = {
   'embed.thanks': 'Teşekkürler! Gönderiminiz alındı.',
   'embed.error': 'Gönderim başarısız. Lütfen tekrar deneyin.',
   'embed.notFound': 'Form bulunamadı veya pasif.',
+  // Pipeline / stage yönetimi
+  'nav.pipeline': 'Pipeline (stage)',
+  'page.pipeline': 'Pipeline & stage',
+  'stage.add': '+ Stage ekle',
+  'stage.namePh': 'Stage adı',
+  'stage.won': 'Kazanıldı',
+  'stage.lost': 'Kaybedildi',
+  'stage.up': 'Sola al',
+  'stage.down': 'Sağa al',
+  'stage.deleteConfirm': 'Bu stage silinsin mi?',
+  'stage.deleteBlocked':
+    'Silinemez: stage’de deal var (arşiv dahil) ya da son stage.',
+  'stage.hint':
+    'Stage’ler Kanban sütunlarıdır. Ekleyin, yeniden adlandırın, sıralayın veya silin; “Kazanıldı/Kaybedildi” kapanış sütunlarını işaretler.',
+  // Webhook (giden entegrasyon) yönetimi
+  'nav.integrations': 'Webhook’lar',
+  'page.integrations': 'Webhook’lar (entegrasyon)',
+  'wh.new': '+ Yeni webhook',
+  'wh.url': 'Uç URL (https)',
+  'wh.events': 'Olaylar',
+  'wh.test': 'Test gönder',
+  'wh.deliveries': 'Teslimatlar',
+  'wh.noDeliveries': 'Henüz teslimat yok.',
+  'wh.secretOnce':
+    'İmza gizli anahtarı — bir kez gösterilir. İmzayı doğrulamak için alıcı tarafta saklayın.',
+  'wh.deleteConfirm': 'Bu webhook silinsin mi?',
+  'wh.howTitle': 'Nasıl alınır & doğrulanır (HMAC)',
+  'wh.howBody':
+    'Olay JSON’u URL’nize x-crm-signature ve x-crm-timestamp başlıklarıyla POST edilir. Doğrula: expected = "sha256=" + HMAC-SHA256(secret, `${timestamp}.${rawBody}`), sabit-zamanlı karşılaştır, ±5 dk pencere içinde. Eşleşmezse reddet.',
+  'wh.inboundNote':
+    'Başka sistemlerden lead mi ALACAKSINIZ? Gelen (imzalı) lead webhook’larını form başına Lead formları sayfasından ayarlayın.',
+  'col.events': 'Olaylar',
+  'col.created': 'Oluşturuldu',
 };
 
 const BUILTIN: Record<string, { name: string; dict: Dict }> = {

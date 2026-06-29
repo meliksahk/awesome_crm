@@ -19,6 +19,9 @@ export function Sidebar() {
           <NavItem href="/lead-forms" label={t('nav.leadForms')} />
         )}
         {can('deal.read') && <NavItem href="/deals" label={t('nav.deals')} />}
+        {can('pipeline.read') && (
+          <NavItem href="/pipeline" label={t('nav.pipeline')} />
+        )}
         {can('contact.read') && (
           <NavItem href="/contacts" label={t('nav.contacts')} />
         )}
@@ -47,6 +50,9 @@ export function Sidebar() {
         )}
         {can('custom_field.read') && (
           <NavItem href="/custom-fields" label={t('nav.customFields')} />
+        )}
+        {can('integration.read') && (
+          <NavItem href="/integrations" label={t('nav.integrations')} />
         )}
         {can('audit.read') && <NavItem href="/audit" label={t('nav.audit')} />}
         {can('role.read') && <NavItem href="/roles" label={t('nav.roles')} />}
