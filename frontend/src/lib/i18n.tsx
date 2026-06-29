@@ -396,6 +396,20 @@ export const en: Dict = {
   'nav.grpConfig': 'Configuration',
   'nav.grpAdmin': 'Administration',
   'nav.grpPrefs': 'Preferences',
+  // Reports — new sections
+  'rep.winRate': 'Win rate',
+  'rep.revenueTitle': 'Monthly revenue',
+  'rep.invoiced': 'Invoiced',
+  'rep.paid': 'Paid',
+  'rep.wonLostTitle': 'Won / Lost (monthly)',
+  'rep.statusTitle': 'Deal status distribution',
+  'rep.byOwnerTitle': 'Sales by salesperson (won value)',
+  'rep.topProductsTitle': 'Top products (by quoted revenue)',
+  'rep.won': 'Won',
+  'rep.lost': 'Lost',
+  'rep.open': 'Open',
+  'rep.unassigned': 'Unassigned',
+  'rep.qty': 'qty',
 };
 
 // --- Türkçe ---
@@ -775,6 +789,20 @@ export const tr: Dict = {
   'nav.grpConfig': 'Yapılandırma',
   'nav.grpAdmin': 'Yönetim',
   'nav.grpPrefs': 'Tercihler',
+  // Raporlar — yeni bölümler
+  'rep.winRate': 'Başarı oranı',
+  'rep.revenueTitle': 'Aylık ciro',
+  'rep.invoiced': 'Faturalanan',
+  'rep.paid': 'Tahsil edilen',
+  'rep.wonLostTitle': 'Kazanılan / Kaybedilen (aylık)',
+  'rep.statusTitle': 'Anlaşma durum dağılımı',
+  'rep.byOwnerTitle': 'Satışçı bazlı satış (kazanılan değer)',
+  'rep.topProductsTitle': 'En çok ürün (teklif cirosu)',
+  'rep.won': 'Kazanıldı',
+  'rep.lost': 'Kaybedildi',
+  'rep.open': 'Açık',
+  'rep.unassigned': 'Atanmamış',
+  'rep.qty': 'adet',
 };
 
 const BUILTIN: Record<string, { name: string; dict: Dict }> = {
