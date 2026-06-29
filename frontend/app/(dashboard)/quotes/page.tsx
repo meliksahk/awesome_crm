@@ -96,6 +96,11 @@ export default function QuotesPage() {
     onSuccess: refresh,
   });
 
+  const del = useMutation({
+    mutationFn: async (id: string) => api.delete(`/quotes/${id}`),
+    onSuccess: refresh,
+  });
+
   const setLine = (i: number, patch: Partial<LineItem>) =>
     setLines(lines.map((l, idx) => (idx === i ? { ...l, ...patch } : l)));
 
@@ -118,7 +123,7 @@ export default function QuotesPage() {
       key: 'actions',
       header: 'İşlem',
       render: (r) => (
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {r.status === 'DRAFT' && can('quote.send') && (
             <Button
               variant="secondary"
@@ -127,6 +132,24 @@ export default function QuotesPage() {
             >
               Gönder
             </Button>
+          )}
+          {r.status === 'SENT' && can('quote.send') && (
+            <>
+              <Button
+                variant="secondary"
+                className="px-2 py-1 text-xs"
+                onClick={() => action.mutate({ id: r.id, verb: 'accept' })}
+              >
+                Kabul
+              </Button>
+              <Button
+                variant="ghost"
+                className="px-2 py-1 text-xs"
+                onClick={() => action.mutate({ id: r.id, verb: 'reject' })}
+              >
+                Ret
+              </Button>
+            </>
           )}
           {(r.status === 'SENT' || r.status === 'ACCEPTED') &&
             can('quote.convert') && (
@@ -137,6 +160,17 @@ export default function QuotesPage() {
                 Faturala
               </Button>
             )}
+          {r.status !== 'CONVERTED' && can('quote.delete') && (
+            <Button
+              variant="danger"
+              className="px-2 py-1 text-xs"
+              onClick={() => {
+                if (confirm('Teklif silinsin mi?')) del.mutate(r.id);
+              }}
+            >
+              Sil
+            </Button>
+          )}
         </div>
       ),
     },

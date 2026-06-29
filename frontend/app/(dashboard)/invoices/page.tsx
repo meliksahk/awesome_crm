@@ -1,10 +1,15 @@
 'use client';
-// app/(dashboard)/invoices/page.tsx — fatura listesi (finansal alanlar izne göre).
-import { useQuery } from '@tanstack/react-query';
+// app/(dashboard)/invoices/page.tsx — fatura: liste + oluştur (kalemli) + issue/ödeme/iptal.
+import { useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, unwrap } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { DashboardTemplate } from '@/components/templates/DashboardTemplate';
 import { DataTable, Column } from '@/components/organisms/DataTable';
+import { CrudFormModal, CrudField } from '@/components/organisms/CrudFormModal';
+import { Card } from '@/components/atoms/Card';
+import { Button } from '@/components/atoms/Button';
+import { FormField } from '@/components/molecules/FormField';
 import { Badge } from '@/components/atoms/Badge';
 import { Spinner } from '@/components/atoms/Spinner';
 import type { Invoice } from '@/types';
@@ -18,17 +23,73 @@ const statusTone: Record<string, 'gray' | 'green' | 'amber' | 'red' | 'blue'> = 
   CANCELLED: 'red',
 };
 
+interface Line {
+  description: string;
+  quantity: string;
+  unitPrice: string;
+}
+
+const PAYMENT_FIELDS: CrudField[] = [
+  { key: 'amount', label: 'Tutar', type: 'number', required: true },
+  {
+    key: 'method',
+    label: 'Yöntem',
+    type: 'select',
+    required: true,
+    options: ['BANK', 'CARD', 'CASH'].map((m) => ({ value: m, label: m })),
+  },
+  { key: 'reference', label: 'Referans' },
+];
+
 export default function InvoicesPage() {
   const { can } = useAuth();
+  const qc = useQueryClient();
   const financial = can('invoice.read_financial');
+  const [creating, setCreating] = useState(false);
+  const [paying, setPaying] = useState<Invoice | null>(null);
+
+  const [customerName, setCustomerName] = useState('');
+  const [taxRate, setTaxRate] = useState('20');
+  const [lines, setLines] = useState<Line[]>([
+    { description: '', quantity: '1', unitPrice: '' },
+  ]);
 
   const invoices = useQuery({
     queryKey: ['invoices'],
-    queryFn: async () => {
-      const res = await api.get('/invoices', { params: { limit: 50 } });
-      return unwrap<Invoice[]>(res.data);
+    queryFn: async () =>
+      unwrap<Invoice[]>(
+        (await api.get('/invoices', { params: { limit: 50 } })).data,
+      ),
+  });
+  const invalidate = () => qc.invalidateQueries({ queryKey: ['invoices'] });
+
+  const create = useMutation({
+    mutationFn: async () =>
+      api.post('/invoices', {
+        customerName,
+        taxRate,
+        lineItems: lines.map((l) => ({
+          description: l.description,
+          quantity: l.quantity,
+          unitPrice: l.unitPrice,
+        })),
+      }),
+    onSuccess: () => {
+      setCreating(false);
+      setCustomerName('');
+      setLines([{ description: '', quantity: '1', unitPrice: '' }]);
+      invalidate();
     },
   });
+
+  const action = useMutation({
+    mutationFn: async (p: { id: string; verb: string }) =>
+      api.post(`/invoices/${p.id}/${p.verb}`),
+    onSuccess: invalidate,
+  });
+
+  const setLine = (i: number, patch: Partial<Line>) =>
+    setLines(lines.map((l, idx) => (idx === i ? { ...l, ...patch } : l)));
 
   const columns: Column<Invoice>[] = [
     { key: 'number', header: 'No', render: (r) => r.number ?? '—' },
@@ -36,7 +97,9 @@ export default function InvoicesPage() {
     {
       key: 'status',
       header: 'Durum',
-      render: (r) => <Badge tone={statusTone[r.status] ?? 'gray'}>{r.status}</Badge>,
+      render: (r) => (
+        <Badge tone={statusTone[r.status] ?? 'gray'}>{r.status}</Badge>
+      ),
     },
     {
       key: 'total',
@@ -50,6 +113,44 @@ export default function InvoicesPage() {
           <span className="text-gray-400">gizli</span>
         ),
     },
+    {
+      key: 'actions',
+      header: 'İşlem',
+      render: (r) => (
+        <div className="flex flex-wrap gap-2">
+          {r.status === 'DRAFT' && can('invoice.update') && (
+            <Button
+              variant="secondary"
+              className="px-2 py-1 text-xs"
+              onClick={() => action.mutate({ id: r.id, verb: 'issue' })}
+            >
+              Kesinleştir
+            </Button>
+          )}
+          {['SENT', 'PARTIALLY_PAID', 'OVERDUE'].includes(r.status) &&
+            can('invoice.update') && (
+              <Button
+                className="px-2 py-1 text-xs"
+                onClick={() => setPaying(r)}
+              >
+                Ödeme
+              </Button>
+            )}
+          {['DRAFT', 'SENT'].includes(r.status) && can('invoice.update') && (
+            <Button
+              variant="danger"
+              className="px-2 py-1 text-xs"
+              onClick={() => {
+                if (confirm('Fatura iptal edilsin mi?'))
+                  action.mutate({ id: r.id, verb: 'cancel' });
+              }}
+            >
+              İptal
+            </Button>
+          )}
+        </div>
+      ),
+    },
   ];
 
   return (
@@ -59,10 +160,98 @@ export default function InvoicesPage() {
           Finansal görüntüleme yetkiniz yok — tutarlar API tarafında maskelenir.
         </p>
       )}
+
+      {can('invoice.create') && !creating && (
+        <div className="mb-4">
+          <Button onClick={() => setCreating(true)}>+ Yeni fatura</Button>
+        </div>
+      )}
+
+      {creating && (
+        <Card className="mb-4 p-4">
+          <div className="mb-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <FormField
+              id="inv-cust"
+              label="Müşteri adı *"
+              value={customerName}
+              onChange={(e) => setCustomerName(e.target.value)}
+            />
+            <FormField
+              id="inv-tax"
+              label="KDV %"
+              value={taxRate}
+              onChange={(e) => setTaxRate(e.target.value)}
+            />
+          </div>
+          <p className="mb-1 text-sm font-medium text-gray-600">Kalemler</p>
+          {lines.map((l, i) => (
+            <div key={i} className="mb-2 grid grid-cols-1 gap-2 sm:grid-cols-12">
+              <input
+                className="rounded-md border border-gray-300 px-2 py-2 text-sm sm:col-span-6"
+                placeholder="Açıklama"
+                value={l.description}
+                onChange={(e) => setLine(i, { description: e.target.value })}
+              />
+              <input
+                className="rounded-md border border-gray-300 px-2 py-2 text-sm sm:col-span-3"
+                placeholder="Miktar"
+                value={l.quantity}
+                onChange={(e) => setLine(i, { quantity: e.target.value })}
+              />
+              <input
+                className="rounded-md border border-gray-300 px-2 py-2 text-sm sm:col-span-3"
+                placeholder="Birim fiyat"
+                value={l.unitPrice}
+                onChange={(e) => setLine(i, { unitPrice: e.target.value })}
+              />
+            </div>
+          ))}
+          <div className="mt-2 flex items-center gap-2">
+            <Button
+              variant="ghost"
+              className="text-xs"
+              onClick={() =>
+                setLines([
+                  ...lines,
+                  { description: '', quantity: '1', unitPrice: '' },
+                ])
+              }
+            >
+              + Kalem
+            </Button>
+            <Button
+              disabled={create.isPending || !customerName.trim()}
+              onClick={() => create.mutate()}
+            >
+              {create.isPending ? 'Oluşturuluyor…' : 'Fatura oluştur'}
+            </Button>
+            <Button variant="ghost" onClick={() => setCreating(false)}>
+              Vazgeç
+            </Button>
+            {create.isError && (
+              <span className="text-sm text-red-600">Oluşturulamadı.</span>
+            )}
+          </div>
+        </Card>
+      )}
+
       {invoices.isLoading ? (
         <Spinner />
       ) : (
         <DataTable columns={columns} rows={invoices.data ?? []} empty="Fatura yok" />
+      )}
+
+      {paying && (
+        <CrudFormModal
+          title={`Ödeme ekle — ${paying.number ?? paying.customerName}`}
+          fields={PAYMENT_FIELDS}
+          submitLabel="Ödemeyi kaydet"
+          onClose={() => setPaying(null)}
+          onSubmit={async (v) => {
+            await api.post(`/invoices/${paying.id}/payments`, v);
+            invalidate();
+          }}
+        />
       )}
     </DashboardTemplate>
   );

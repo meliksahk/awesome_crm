@@ -11,10 +11,12 @@ export function DataTable<T extends { id: string }>({
   columns,
   rows,
   empty = 'Kayıt yok',
+  onRowClick,
 }: {
   columns: Column<T>[];
   rows: T[];
   empty?: string;
+  onRowClick?: (row: T) => void;
 }) {
   return (
     <Card className="overflow-hidden">
@@ -40,7 +42,11 @@ export function DataTable<T extends { id: string }>({
             </tr>
           ) : (
             rows.map((row) => (
-              <tr key={row.id} className="hover:bg-gray-50">
+              <tr
+                key={row.id}
+                onClick={onRowClick ? () => onRowClick(row) : undefined}
+                className={`hover:bg-gray-50 ${onRowClick ? 'cursor-pointer' : ''}`}
+              >
                 {columns.map((c) => (
                   <td key={c.key} className="px-4 py-3 text-gray-700">
                     {c.render(row)}

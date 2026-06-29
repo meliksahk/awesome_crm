@@ -65,6 +65,7 @@ export interface UnqualifiedLead {
   firstName: string;
   lastName: string;
   email: string | null;
+  phone: string | null;
   companyName: string | null;
   source: string | null;
   status: 'NEW' | 'WORKING' | 'QUALIFIED' | 'UNQUALIFIED' | 'CONVERTED';
@@ -75,6 +76,8 @@ export interface Company {
   name: string;
   domain: string | null;
   industry: string | null;
+  phone: string | null;
+  website: string | null;
   contactCount: number;
 }
 
@@ -83,7 +86,9 @@ export interface Contact {
   firstName: string;
   lastName: string;
   email: string | null;
+  phone: string | null;
   title: string | null;
+  companyId: string | null;
   company: { id: string; name: string } | null;
 }
 

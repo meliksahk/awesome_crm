@@ -55,6 +55,13 @@ export default function DealsPage() {
 
   const firstStage = board.data?.stages[0]?.id;
 
+  const moveDeal = useMutation({
+    mutationFn: async ({ id, toStageId }: { id: string; toStageId: string }) => {
+      await api.patch(`/deals/${id}/move`, { toStageId });
+    },
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ['board'] }),
+  });
+
   const createDeal = useMutation({
     mutationFn: async () => {
       // Yalnız dolu opsiyonel alanları gönder (boş e-posta/değer backend doğrulamasına takılır).
@@ -178,7 +185,15 @@ export default function DealsPage() {
       {board.isLoading || pipelines.isLoading ? (
         <Spinner />
       ) : board.data ? (
-        <DealsBoard board={board.data} onSelect={setSelected} />
+        <DealsBoard
+          board={board.data}
+          onSelect={setSelected}
+          onMove={
+            can('deal.move')
+              ? (id, toStageId) => moveDeal.mutate({ id, toStageId })
+              : undefined
+          }
+        />
       ) : (
         <p className="text-sm text-gray-500">Pipeline bulunamadı.</p>
       )}
