@@ -1,29 +1,29 @@
-# Katkı Rehberi
+# Contributing Guide
 
-Açık Kaynak CRM'e katkıda bulunduğunuz için teşekkürler!
+Thanks for contributing to Açık Kaynak CRM (Open-Source CRM)!
 
-## Geliştirme Akışı
+## Development workflow
 
-1. Repoyu fork'layın ve `feature/<kısa-ad>` dalı açın.
-2. İlgili faz dokümanını (`docs/0X-...`) ve [Mimari Genel Bakış](./docs/00-mimari-genel-bakis.md)'ı okuyun.
-3. Değişikliği yapın; **mimari kurallara** uyun (aşağı bkz.).
-4. `npm run lint && npm run test && npm run test:e2e` yeşil olmalı.
-5. Anlamlı commit mesajı (NE + NEDEN). PR açın; kabul kriterlerini işaretleyin.
+1. Fork the repo and create a `feature/<short-name>` branch.
+2. Read the README (architecture, modules, and roadmap) before starting.
+3. Make your change; follow the **architecture rules** (below).
+4. `npm run lint && npm run test && npm run test:e2e` must be green.
+5. Write a meaningful commit message (WHAT + WHY). Open a PR and check the acceptance criteria.
 
-## Değişmez Mimari Kuralları
+## Immutable architecture rules
 
-- **Katmanlı mimari:** `Controller → Service → Repository`. Controller'da iş mantığı yok;
-  `prisma.*` çağrısı **yalnızca** Repository'de.
-- **Secure by default:** Tüm endpoint korumalı; herkese açık olanlar bilinçli `@Public()`.
-- **DTO + validation:** Tüm girdiler class-validator DTO'larından geçer.
-- **Sırlar `.env`'de;** koda gömülmez. Parola/token/PII loglanmaz.
-- **Frontend:** Atomic Design katmanları (Atoms → Molecules → Organisms → Templates → Pages).
+- **Layered architecture:** `Controller → Service → Repository`. No business logic in
+  controllers; `prisma.*` calls **only** in repositories.
+- **Secure by default:** every endpoint is protected; public ones are deliberately `@Public()`.
+- **DTO + validation:** all inputs go through class-validator DTOs.
+- **Secrets in `.env`;** never hardcoded. Passwords/tokens/PII are never logged.
+- **Frontend:** Atomic Design layers (Atoms → Molecules → Organisms → Templates → Pages).
 
-## Test Beklentisi
+## Test expectations
 
-Her değişiklik mutlu yol **ve** hata/güvenlik (negatif) yollarını test etmelidir.
-Kapsam hedefleri ve test piramidi: [Test Stratejisi](./docs/91-test-stratejisi.md).
+Every change must cover the happy path **and** the error/security (negative) paths.
+Follow the test pyramid: many unit tests, focused integration/E2E for critical flows.
 
-## Davranış Kuralları
+## Code of conduct
 
-Saygılı, yapıcı ve kapsayıcı olun. Taciz veya ayrımcılığa yer yoktur.
+Be respectful, constructive, and inclusive. There is no place for harassment or discrimination.

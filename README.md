@@ -1,8 +1,8 @@
 <div align="center">
 
-# Açık Kaynak CRM
+# Açık Kaynak CRM (Open-Source CRM)
 
-**Kurumsal düzeyde, ölçeklenebilir, yüksek güvenlikli, çoklu rol (RBAC) ve çoklu kiracı (multi-tenant) destekli, API-First açık kaynak CRM.**
+**An enterprise-grade, scalable, secure, role-based (RBAC) and multi-tenant, API-First open-source CRM.**
 
 NestJS + PostgreSQL/Prisma backend · Next.js 14 (App Router) + Atomic Design frontend · Docker
 
@@ -10,347 +10,360 @@ NestJS + PostgreSQL/Prisma backend · Next.js 14 (App Router) + Atomic Design fr
 [![Backend](https://img.shields.io/badge/Backend-NestJS-e0234e.svg)](https://nestjs.com)
 [![Frontend](https://img.shields.io/badge/Frontend-Next.js%2014-black.svg)](https://nextjs.org)
 [![DB](https://img.shields.io/badge/DB-PostgreSQL%20%2B%20Prisma-336791.svg)](https://www.prisma.io)
-[![Tests](https://img.shields.io/badge/tests-106%20unit%20%2F%20108%20e2e-brightgreen.svg)](#test--kalite)
+[![Tests](https://img.shields.io/badge/tests-106%20unit%20%2F%20108%20e2e-brightgreen.svg)](#tests--quality)
+[![Built with Claude Code](https://img.shields.io/badge/built%20with-Claude%20Code-d97757.svg)](https://claude.com/claude-code)
 
 </div>
 
 ---
 
-## İçindekiler
+## Table of contents
 
-- [Neler sunar?](#neler-sunar)
-- [Öne çıkan özellikler](#öne-çıkan-özellikler)
-- [Teknoloji yığını](#teknoloji-yığını)
-- [Mimari & güvenlik ilkeleri](#mimari--güvenlik-ilkeleri)
-- [Roller & izinler](#roller--izinler)
-- [Modüller & API yüzeyi](#modüller--api-yüzeyi)
-- [Yol haritası](#yol-haritası)
-- [Hızlı başlangıç](#hızlı-başlangıç)
-- [Demo & test girişleri](#demo--test-girişleri)
-- [Ortam değişkenleri](#ortam-değişkenleri)
-- [Test & kalite](#test--kalite)
-- [Proje yapısı](#proje-yapısı)
-- [Bilinçli sınırlar (dürüstlük notu)](#bilinçli-sınırlar-dürüstlük-notu)
-- [Dokümantasyon · Katkı · Lisans](#dokümantasyon)
-
----
-
-## Neler sunar?
-
-Açık Kaynak CRM; satış hattı (pipeline) yönetiminden faturalandırmaya, yapay zekâ
-destekli satış yardımcılarından çoklu kiracı izolasyonuna kadar uçtan uca bir CRM
-deneyimi sunar. Tüm iş mantığı **API-First** tasarlanır; panel (Next.js) bu API'yi
-tüketir. Her endpoint **varsayılan korumalıdır** (secure-by-default), yetkiler
-**rol + izin** ikili katmanıyla her istekte güncel kaynaktan doğrulanır.
+- [What it offers](#what-it-offers)
+- [Feature highlights](#feature-highlights)
+- [Tech stack](#tech-stack)
+- [Architecture & security principles](#architecture--security-principles)
+- [Roles & permissions](#roles--permissions)
+- [Modules & API surface](#modules--api-surface)
+- [Roadmap](#roadmap)
+- [Quick start](#quick-start)
+- [Demo & test logins](#demo--test-logins)
+- [Environment variables](#environment-variables)
+- [Tests & quality](#tests--quality)
+- [Project structure](#project-structure)
+- [Known limitations (honest notes)](#known-limitations-honest-notes)
+- [Built with Claude Code](#built-with-claude-code)
+- [Contributing · License](#contributing)
 
 ---
 
-## Öne çıkan özellikler
+## What it offers
 
-### 🔐 Kimlik & Yetkilendirme
-- **JWT** (Access + Refresh) — refresh **rotasyonu** + reuse/çalıntı tespiti (token tekrar kullanımında tüm oturumlar iptal).
-- **bcrypt** parola hash'i; zamanlama saldırısı ve kullanıcı enumeration koruması.
-- **RBAC** iki katman: rol (`@Roles`) + izin (`@Permissions`), AND mantığı. Yetkiler her istekte DB'den okunur (token'a körü körüne güvenilmez).
-- IDOR/sahiplik kontrolü; `@Public()` ile bilinçli açılan uçlar dışında her şey korumalı.
+Açık Kaynak CRM delivers an end-to-end CRM experience — from sales-pipeline
+management to invoicing, from AI-assisted sales helpers to multi-tenant isolation.
+All business logic is **API-First**; the Next.js panel consumes that API. Every
+endpoint is **secure by default**, and authorization is verified on every request
+from the live source through a two-layer **role + permission** model.
 
-### 📊 Satış (CRM çekirdeği)
-- **Pipeline + Kanban**: kesirli rank ile çakışmasız sürükle-bırak taşıma; atomik aşama/sıra değişimi (tek transaction) + aktivite kaydı.
-- **Deal (Anlaşma)**: CRUD, sahiplik tabanlı erişim, durum (OPEN/WON/LOST), aktiviteler (NOTE/CALL/EMAIL/STAGE_CHANGE).
-- **Lead (nitelenmemiş)** → `convert` akışıyla Contact + Company + Deal'e dönüşüm.
-- **Company / Contact**: ilişkili kişi/şirket kayıtları.
-- **Meeting**: toplantı/takvim kaydı (tarih doğrulamalı).
+---
 
-### 💰 Finans
-- **Fatura** yaşam döngüsü: DRAFT → SENT → PARTIALLY_PAID → PAID / CANCELLED; immutability (yalnız DRAFT düzenlenir).
-- Tüm tutarlar **Decimal** (float yasak); sunucu tarafı hesap; aşırı ödeme engeli.
-- **Sıralı, atlamasız fatura numarası** (yıl bazlı atomik sayaç, `ON CONFLICT`).
-- **Finansal maskeleme**: `invoice.read_financial` izni yoksa tutar/kalem/ödeme API'de kesilir (SALES görür ama rakamları göremez).
+## Feature highlights
 
-### 🧾 Ürün & Teklif (CPQ)
-- **Ürün kataloğu** (SKU benzersiz, Decimal fiyat, soft delete).
-- **Teklif** yaşam döngüsü (DRAFT/SENT/ACCEPTED/REJECTED/EXPIRED/CONVERTED); productId çözümleme, sunucu Decimal toplam.
-- `send` → sıralı teklif numarası (QUO-yıl-seq); **`convert` → DRAFT Fatura** (tek transaction, idempotent — çift dönüşüm engelli).
+### 🔐 Authentication & authorization
+- **JWT** (access + refresh) with refresh **rotation** + reuse/theft detection (any token reuse revokes all sessions).
+- **bcrypt** password hashing; timing-attack and user-enumeration protection.
+- **RBAC** in two layers: role (`@Roles`) + permission (`@Permissions`), AND logic. Permissions are read from the DB on every request (the token is never blindly trusted).
+- IDOR/ownership checks; everything is protected except endpoints deliberately opened with `@Public()`.
 
-### 🤖 Yapay Zekâ (Claude)
-- **Anthropic SDK** + `claude-opus-4-8` + structured outputs ile: **deal puanlama** (0–100 + sonraki adımlar), **takip e-postası taslağı**, **metin özetleme**.
-- `ANTHROPIC_API_KEY` **opsiyoneldir** — yoksa uçlar zarifçe **503** döner, uygulama yine açılır (`/ai/status` ile panel özelliği gösterir/gizler).
+### 📊 Sales (CRM core)
+- **Pipeline + Kanban**: collision-free drag-and-drop via fractional ranking; atomic stage/order change (single transaction) + activity log.
+- **Deal**: CRUD, ownership-based access, status (OPEN/WON/LOST), activities (NOTE/CALL/EMAIL/STAGE_CHANGE).
+- **Lead (unqualified)** → `convert` flow into Contact + Company + Deal.
+- **Company / Contact**: related people/organization records.
+- **Meeting**: calendar/meeting records (with date validation).
 
-### ⚙️ Otomasyon & Özelleştirme
-- **No-code otomasyon motoru**: olay tetikleyici (record.created / stage.changed / field.updated) → eylem (aktivite/e-posta/log). Mevcut event bus üzerine kurulu.
-- **Low-code özel alanlar**: `CustomFieldDef` + kayıtlarda `customFields` (Deal); TEXT/NUMBER/BOOLEAN/DATE/SELECT doğrulama + zorunluluk.
+### 💰 Finance
+- **Invoice** lifecycle: DRAFT → SENT → PARTIALLY_PAID → PAID / CANCELLED; immutability (only DRAFT is editable).
+- All amounts are **Decimal** (no floats); server-side computation; overpayment guard.
+- **Sequential, gap-free invoice numbers** (yearly atomic counter via `ON CONFLICT`).
+- **Financial masking**: without the `invoice.read_financial` permission, amounts/line-items/payments are stripped at the API layer (SALES sees the invoice but not the figures).
 
-### 📈 Raporlama
-- Pipeline değeri, dönem/durum özetleri, aşama olasılığıyla **ağırlıklı forecast**, finansal fatura özeti (yetkiye bağlı).
+### 🧾 Product & Quote (CPQ)
+- **Product catalog** (unique SKU, Decimal price, soft delete).
+- **Quote** lifecycle (DRAFT/SENT/ACCEPTED/REJECTED/EXPIRED/CONVERTED); productId resolution, server-side Decimal totals.
+- `send` → sequential quote number (QUO-year-seq); **`convert` → DRAFT Invoice** (single transaction, idempotent — double conversion blocked).
 
-### 🔗 Entegrasyon & Veri
-- **Giden webhook**: HMAC-SHA256 imza, replay penceresi, idempotency, SSRF koruması.
-- **E-posta**: `simulated` ve gerçek `smtp` (nodemailer) sürücüleri + şablon motoru + EmailLog.
-- **CSV içe/dışa aktarma**: contacts/companies/deals dışa aktarım; contacts/companies içe aktarım (**dedup** + satır hataları).
-- **Yinelenen tespiti + birleştirme** (merge): kaynak kaydın deal/kişileri hedefe taşınır, kaynak silinir (tek transaction).
+### 🤖 Artificial intelligence (Claude)
+- Via the **Anthropic SDK** + `claude-opus-4-8` + structured outputs: **deal scoring** (0–100 + next steps), **follow-up email drafting**, **text summarization**.
+- `ANTHROPIC_API_KEY` is **optional** — without it the endpoints return a graceful **503** and the app still boots (`/ai/status` lets the panel show/hide the feature).
 
-### 🛡️ Platform olgunluk
-- **Denetim kaydı (AuditLog)**: tüm değişiklik istekleri (aktör/eylem/varlık/durum) append-only kaydedilir; admin listeler.
-- **Global arama**: deal/contact/company üzerinde, sonuçlar **izne göre süzülür**.
-- **KVKK/GDPR**: kişi verisini dışa aktar (taşınabilirlik) + sil (unutulma; deal bağı kopar).
-- **PWA**: manifest + ikon + tema.
+### ⚙️ Automation & customization
+- **No-code automation engine**: event triggers (record.created / stage.changed / field.updated) → actions (activity/email/log). Built on the existing event bus.
+- **Low-code custom fields**: `CustomFieldDef` + `customFields` on records (Deal); TEXT/NUMBER/BOOLEAN/DATE/SELECT validation + required flag.
 
-### 🏢 Çoklu kiracı (Multi-tenancy)
-- **JWT tenant claim** ile izolasyon — tenant'a bağlı kullanıcı `x-tenant-id` başlığıyla **kendi tenant'ını ezemez**.
-- Merkezi Prisma `$use` katmanı tenant kapsamlı modellere `tenantId`'yi **otomatik enjekte/filtre** eder (unutma = sızıntı riski ortadan kalkar).
-- `tenantId = null` → **platform-admin** (cross-tenant); Tenant CRUD + kullanıcı→tenant atama.
+### 📈 Reporting
+- Pipeline value, period/status summaries, **weighted forecast** by stage probability, financial invoice summary (permission-gated).
+
+### 🔗 Integration & data
+- **Outbound webhooks**: HMAC-SHA256 signature, replay window, idempotency, SSRF protection.
+- **Email**: `simulated` and real `smtp` (nodemailer) drivers + template engine + EmailLog.
+- **CSV import/export**: export contacts/companies/deals; import contacts/companies (**dedup** + per-row errors).
+- **Duplicate detection + merge**: the source record's deals/contacts are moved to the target, then the source is deleted (single transaction).
+
+### 🛡️ Platform maturity
+- **Audit log**: every mutating request (actor/action/entity/status) is recorded append-only; admins can list it.
+- **Global search**: across deal/contact/company, with results **filtered by permission**.
+- **GDPR**: export a person's data (portability) + erase (right to be forgotten; deal links are detached).
+- **PWA**: manifest + icon + theme.
+
+### 🏢 Multi-tenancy
+- Isolation via a **JWT tenant claim** — a tenant-bound user **cannot override their tenant** with an `x-tenant-id` header.
+- A central Prisma `$use` layer **auto-injects/filters** `tenantId` on tenant-scoped models (eliminating the "forgot to scope = data leak" risk).
+- `tenantId = null` → **platform admin** (cross-tenant); Tenant CRUD + user→tenant assignment.
 
 ### 🐳 DevOps
-- Çok aşamalı **Docker** imajı (root olmayan kullanıcı), `docker-compose` (DB iç ağda, host'a açılmaz), sağlık ucu, fail-fast env doğrulama (Joi).
+- Multi-stage **Docker** image (non-root user), `docker-compose` (DB internal-only, not exposed to host), health endpoint, fail-fast env validation (Joi).
 
 ---
 
-## Teknoloji yığını
+## Tech stack
 
-| Katman | Teknoloji |
-|--------|-----------|
-| **Backend** | NestJS · PostgreSQL · Prisma (migration tabanlı) · JWT · bcrypt · class-validator/transformer · Swagger · `@anthropic-ai/sdk` · nodemailer |
+| Layer | Technology |
+|-------|------------|
+| **Backend** | NestJS · PostgreSQL · Prisma (migration-based) · JWT · bcrypt · class-validator/transformer · Swagger · `@anthropic-ai/sdk` · nodemailer |
 | **Frontend** | Next.js 14 (App Router) · TypeScript · Tailwind · Atomic Design · Axios + React Query |
-| **DevOps** | Docker · docker-compose · Joi env doğrulama |
+| **DevOps** | Docker · docker-compose · Joi env validation |
 
 ---
 
-## Mimari & güvenlik ilkeleri
+## Architecture & security principles
 
-- **API-First** + katmanlı mimari: **`Controller → Service → Repository`**. Controller'da iş mantığı yok; **`prisma.*` çağrısı yalnızca Repository'de**.
-- **Secure by default**: global `JwtAuthGuard`; herkese açık uçlar bilinçli `@Public()`.
-- **Zaman**: karar/iş mantığı sunucu UTC; gösterim ayrı tz katmanında.
-- **Finans**: `Decimal` (float yasak); fatura immutability; idempotency.
-- **Webhook**: HMAC imzası doğrulanmadan hiçbir iş/DB yazımı yok.
-- **Sırlar**: tüm gizli değerler `.env`'den; koda gömülmez; env şeması Joi ile başlangıçta doğrulanır (fail-fast). Parola/token/PII loglanmaz.
-- **Hata yanıtı**: global `AllExceptionsFilter`; production'da stack/SQL sızdırılmaz. Standart zarf: `{ success, data, meta }` / `{ success, error }`.
-- **Frontend Atomic Design**: atomlar → moleküller → organizmalar → şablonlar → sayfalar; bir bileşen yalnız alt seviyeden import eder.
-
----
-
-## Roller & izinler
-
-İzinler `kaynak.eylem` biçimindedir (`deal.read`, `invoice.read_financial`, `ai.use`, `platform.tenant.manage`, …) ve merkezî olarak tanımlanır. Varsayılan rol → izin eşlemesi (en az ayrıcalık):
-
-| Rol | Özet yetki |
-|-----|-----------|
-| **ADMIN** | Tüm izinler (platform yönetimi dâhil) |
-| **MANAGER** | Deal/Lead/Company/Contact/Meeting tam · entegrasyon · otomasyon · özel alan · ürün/teklif · AI · veri içe/dışa/merge |
-| **SALES** | Deal/Lead (kendi) · şirket/kişi · ürün(okuma)/teklif · AI · CSV dışa aktar · **fatura tutarlarını göremez** (maskeli) |
-| **FINANCE** | Fatura tam + **finansal okuma** · ürün(okuma)/teklif(okuma+convert) |
-| **VIEWER** | Salt-okuma (hassas finansal okuma hariç) |
-
-> Panel menüsü ve butonlar izne göre gösterilir/gizlenir; backend her istekte yetkiyi tekrar doğrular.
+- **API-First** + layered architecture: **`Controller → Service → Repository`**. No business logic in controllers; **`prisma.*` calls only in repositories**.
+- **Secure by default**: global `JwtAuthGuard`; public endpoints are deliberately `@Public()`.
+- **Time**: decision/business logic on server UTC; presentation in a separate tz layer.
+- **Finance**: `Decimal` (no floats); invoice immutability; idempotency.
+- **Webhooks**: no business/DB write happens before the HMAC signature is verified.
+- **Secrets**: all secret values come from `.env`, never hardcoded; env schema is validated at startup with Joi (fail-fast). Passwords/tokens/PII are never logged.
+- **Error responses**: global `AllExceptionsFilter`; no stack/SQL leakage in production. Standard envelope: `{ success, data, meta }` / `{ success, error }`.
+- **Frontend Atomic Design**: atoms → molecules → organisms → templates → pages; a component imports only from lower levels.
 
 ---
 
-## Modüller & API yüzeyi
+## Roles & permissions
 
-Tüm uçlar `/api/v1` ön ekiyle servis edilir (Swagger: `/api/docs`).
+Permissions follow a `resource.action` shape (`deal.read`, `invoice.read_financial`, `ai.use`, `platform.tenant.manage`, …) and are defined centrally. Default role → permission mapping (least privilege):
 
-| Alan | Başlıca uçlar |
-|------|---------------|
+| Role | Summary of access |
+|------|-------------------|
+| **ADMIN** | All permissions (including platform management) |
+| **MANAGER** | Full Deal/Lead/Company/Contact/Meeting · integrations · automation · custom fields · product/quote · AI · data import/export/merge |
+| **SALES** | Deal/Lead (own) · company/contact · product (read)/quote · AI · CSV export · **cannot see invoice amounts** (masked) |
+| **FINANCE** | Full invoices + **financial read** · product (read)/quote (read + convert) |
+| **VIEWER** | Read-only (except sensitive financial read) |
+
+> The panel menu and buttons are shown/hidden by permission; the backend re-verifies authorization on every request.
+
+---
+
+## Modules & API surface
+
+All endpoints are served under the `/api/v1` prefix (Swagger: `/api/docs`).
+
+| Area | Main endpoints |
+|------|----------------|
 | **Auth** | `POST /auth/login` · `/auth/register` · `/auth/refresh` · `/auth/logout` |
-| **Kullanıcı/Rol** | `/users` · `/roles` (CRUD + rol atama) |
+| **Users/Roles** | `/users` · `/roles` (CRUD + role assignment) |
 | **Deal/Kanban** | `/deals` · `/deals/board` · `PATCH /deals/:id/move` · `/deals/:id/activities` |
 | **Lead** | `/leads` · `POST /leads/:id/convert` |
 | **Company / Contact** | `/companies` · `/contacts` |
 | **Meeting** | `/meetings` |
-| **Fatura** | `/invoices` · `POST /:id/issue` · `/:id/payments` · `/:id/cancel` |
-| **Ürün / Teklif** | `/products` · `/quotes` · `POST /quotes/:id/{send,accept,reject,convert}` |
+| **Invoice** | `/invoices` · `POST /:id/issue` · `/:id/payments` · `/:id/cancel` |
+| **Product / Quote** | `/products` · `/quotes` · `POST /quotes/:id/{send,accept,reject,convert}` |
 | **AI** | `GET /ai/status` · `POST /ai/deals/:id/score` · `/ai/draft-email` · `/ai/summarize` |
-| **Otomasyon** | `/automation-rules` |
-| **Özel alan** | `/custom-fields` |
-| **Rapor** | `/reports/{pipeline,deals/summary,forecast,invoices/summary}` |
-| **Entegrasyon** | `/integrations/webhooks` (+ gelen webhook HMAC doğrulama) |
-| **Veri** | `GET /data/export/:entity` · `POST /data/import/:entity` · `/data/duplicates/:entity` · `/data/merge/:entity` |
+| **Automation** | `/automation/rules` |
+| **Custom fields** | `/custom-fields` |
+| **Reports** | `/reports/{pipeline,deals/summary,forecast,invoices/summary}` |
+| **Integrations** | `/integrations/webhooks` (+ inbound webhook HMAC verification) |
+| **Data** | `GET /data/export/:entity` · `POST /data/import/:entity` · `/data/duplicates/:entity` · `/data/merge/:entity` |
 | **Platform** | `/audit-logs` · `GET /search?q=` · `/gdpr/contacts/:id/{export,erase}` · `/tenants` (+ `:id/assign-user`) |
-| **Sağlık** | `GET /health` |
+| **Health** | `GET /health` |
 
 ---
 
-## Yol haritası
+## Roadmap
 
-### v1 — Temel CRM (6 faz) ✅
-| Faz | Kapsam |
-|-----|--------|
-| 1 | Temel mimari + Prisma şeması + JWT kimlik doğrulama |
-| 2 | RBAC guard'ları + kullanıcı yönetimi |
+### v1 — Core CRM (6 phases) ✅
+| Phase | Scope |
+|-------|-------|
+| 1 | Core architecture + Prisma schema + JWT authentication |
+| 2 | RBAC guards + user management |
 | 3 | Lead/Deal + Kanban |
-| 4 | Finans & fatura (izole yetkiler, maskeleme) |
-| 5 | Dış entegrasyonlar (webhook, SMTP) |
-| 6 | Dockerization + multi-tenancy temeli |
+| 4 | Finance & invoicing (isolated permissions, masking) |
+| 5 | External integrations (webhook, SMTP) |
+| 6 | Dockerization + multi-tenancy foundation |
 
-### v2 — Kurumsal yetkinlikler (V2.1–V2.10) ✅
-| Alt-faz | Kapsam |
-|---------|--------|
-| V2.1 | Company/Contact + Lead→Deal refactor + nitelenmemiş Lead/convert |
-| V2.2 | Gerçek SMTP + şablon motoru + Meeting |
-| V2.3 | No-code otomasyon motoru |
-| V2.4 | Raporlama & forecast |
-| V2.5 | Low-code özel alanlar |
-| V2.6 | **AI katmanı (Claude, key opsiyonel)** |
-| V2.7 | **Ürün + Teklif/CPQ → Fatura** |
-| V2.8 | **CSV içe/dışa aktarma + dedup/merge** |
-| V2.9 | **AuditLog + arama + GDPR + PWA** |
-| V2.10 | **Multi-tenancy tamamlama (JWT tenant claim + platform-admin)** |
-
-Detaylı v2 planı: [`docs/11-v2-fazlar.md`](./docs/11-v2-fazlar.md) · pazar karşılaştırması: [`docs/10`](./docs/10-pazar-karsilastirma-ve-v2.md).
+### v2 — Enterprise capabilities (V2.1–V2.10) ✅
+| Sub-phase | Scope |
+|-----------|-------|
+| V2.1 | Company/Contact + Lead→Deal refactor + unqualified Lead/convert |
+| V2.2 | Real SMTP + template engine + Meeting |
+| V2.3 | No-code automation engine |
+| V2.4 | Reporting & forecast |
+| V2.5 | Low-code custom fields |
+| V2.6 | **AI layer (Claude, key optional)** |
+| V2.7 | **Product + Quote/CPQ → Invoice** |
+| V2.8 | **CSV import/export + dedup/merge** |
+| V2.9 | **Audit log + search + GDPR + PWA** |
+| V2.10 | **Multi-tenancy completion (JWT tenant claim + platform admin)** |
 
 ---
 
-## Hızlı başlangıç
+## Quick start
 
-**Gereksinimler:** Node.js ≥ 20 · Docker + Docker Compose (lokalde alternatif: PostgreSQL ≥ 14).
+**Requirements:** Node.js ≥ 20 · Docker + Docker Compose (local alternative: PostgreSQL ≥ 14).
 
-### Seçenek A — Tüm yığını Docker ile (prod-benzeri)
+### Option A — Full stack with Docker (production-like)
 
 ```bash
-cp .env.example .env            # KÖK .env: POSTGRES_* + JWT secret'ları doldur
+cp .env.example .env                  # root .env: fill in POSTGRES_* + JWT secrets
 docker compose -p crm up -d --build   # db + backend(:3000) + frontend(:3001) + mailhog(:8025) + tunnel
-# Backend başlangıçta migration'ları uygular. Panel: http://localhost:3001 · Sağlık: /api/v1/health
-docker compose -p crm exec backend npm run seed        # roller+izinler+admin+pipeline
-docker compose -p crm exec backend npm run seed:demo   # rol bazlı test kullanıcıları + örnek veri
-# Paylaşılabilir tünel adresi (Cloudflare quick tunnel):
+# Backend applies migrations on startup. Panel: http://localhost:3001 · Health: /api/v1/health
+docker compose -p crm exec backend npm run seed        # roles + permissions + admin + pipeline
+docker compose -p crm exec backend npm run seed:demo   # role-based test users + sample data
+# Shareable tunnel address (Cloudflare quick tunnel):
 docker compose -p crm logs tunnel | grep trycloudflare
 ```
 
-> Tüm servisler `restart: unless-stopped` ile çalışır → terminal/oturum kapansa da
-> ayakta kalır. `frontend` `/api`'yi container içi ağda `backend:3000`'e proxy'ler
-> (BACKEND_URL build arg ile baked). Tünel ücretsiz olduğundan container yeniden
-> başlatılınca adres değişir; sabit adres için adlandırılmış Cloudflare tüneli kullanın.
+> All services run with `restart: unless-stopped` → they survive terminal/session
+> shutdown. `frontend` proxies `/api` to `backend:3000` over the internal network
+> (BACKEND_URL is baked in via a build arg). Because the tunnel is free, the address
+> changes when the container restarts; use a named Cloudflare tunnel for a stable address.
 
-### Seçenek B — Backend lokalde, yalnız DB Docker'da
+### Option B — Backend locally, DB only in Docker
 
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d db
 
 cd backend
 cp .env.example .env            # DATABASE_URL → localhost:5432
-npm install                     # Windows: bkz. not (script-shell)
-npx prisma migrate dev          # şemayı oluştur
-npm run seed                    # roller + izinler + admin + pipeline
+npm install                     # Windows: see note (script-shell)
+npx prisma migrate dev          # create the schema
+npm run seed                    # roles + permissions + admin + pipeline
 npm run start:dev               # http://localhost:3000  (Swagger: /api/docs)
 ```
 
-> **Windows notu:** PowerShell'de bazı postinstall script'leri `||` nedeniyle hata verir.
-> `npm install --script-shell "C:\\Windows\\System32\\cmd.exe"` ile kurun.
+> **Windows note:** in PowerShell some postinstall scripts fail due to `||`.
+> Install with `npm install --script-shell "C:\\Windows\\System32\\cmd.exe"`.
 
 ### Frontend (Next.js)
 
 ```bash
 cd frontend
 npm install
-npm run dev        # http://localhost:3001  (/api → backend'e proxy)
+npm run dev        # http://localhost:3001  (/api → proxied to backend)
 ```
 
-> Frontend `/api/*` isteklerini **sunucu tarafında** backend'e proxy'ler (tek origin →
-> CORS/cookie sorunsuz, tünel dostu). Backend adresi `BACKEND_URL` env'i ile değişir
-> (varsayılan `http://localhost:3000`).
+> The frontend proxies `/api/*` to the backend **server-side** (single origin → no
+> CORS/cookie issues, tunnel-friendly). The backend address is set via `BACKEND_URL`
+> (default `http://localhost:3000`).
 
 ---
 
-## Demo & test girişleri
+## Demo & test logins
 
 ```bash
-cd backend && npm run seed && npm run seed:demo   # rol bazlı kullanıcılar + örnek veri
+cd backend && npm run seed && npm run seed:demo   # role-based users + sample data
 ```
 
-| Rol | E-posta | Parola |
-|-----|---------|--------|
+| Role | Email | Password |
+|------|-------|----------|
 | ADMIN | `admin@crm.dev` | `ChangeMe!2026` |
 | MANAGER | `manager@crm.dev` | `Demo!2026` |
 | SALES | `sales@crm.dev` | `Demo!2026` |
 | FINANCE | `finance@crm.dev` | `Demo!2026` |
 | VIEWER | `viewer@crm.dev` | `Demo!2026` |
 
-> Roller farklı yetkiler görür: SALES faturada tutarları göremez (maskeli), FINANCE görür;
-> VIEWER salt-okuma; menü öğeleri izne göre gösterilir.
+> Roles see different things: SALES cannot see invoice amounts (masked), FINANCE can;
+> VIEWER is read-only; menu items are shown by permission.
 
 ---
 
-## Ortam değişkenleri
+## Environment variables
 
-Başlıca backend değişkenleri (`backend/.env.example`):
+Key backend variables (`backend/.env.example`):
 
-| Değişken | Açıklama |
-|----------|----------|
-| `DATABASE_URL` | PostgreSQL bağlantısı (zorunlu) |
-| `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` | JWT sırları (farklı olmalı, zorunlu) |
-| `JWT_ACCESS_TTL` / `JWT_REFRESH_TTL` | Token ömürleri (vars. `15m` / `7d`) |
-| `BCRYPT_COST` | bcrypt maliyeti (10–15, vars. 12) |
-| `CORS_ORIGINS` · `COOKIE_SECURE` | CORS/çerez ayarları |
-| `THROTTLE_TTL` · `THROTTLE_LIMIT` | Hız sınırlama |
-| `MAIL_DRIVER` | `simulated` \| `smtp` · `SMTP_*` (smtp ise) |
-| `WEBHOOK_ALLOW_PRIVATE` · `INBOUND_WEBHOOK_SECRET` | Webhook ayarları |
-| `ANTHROPIC_API_KEY` | **Opsiyonel** — yoksa AI uçları 503 |
-| `AI_MODEL` | AI modeli (vars. `claude-opus-4-8`) |
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | PostgreSQL connection (required) |
+| `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` | JWT secrets (must differ, required) |
+| `JWT_ACCESS_TTL` / `JWT_REFRESH_TTL` | Token lifetimes (default `15m` / `7d`) |
+| `BCRYPT_COST` | bcrypt cost (10–15, default 12) |
+| `CORS_ORIGINS` · `COOKIE_SECURE` | CORS/cookie settings |
+| `THROTTLE_TTL` · `THROTTLE_LIMIT` | Rate limiting |
+| `MAIL_DRIVER` | `simulated` \| `smtp` · `SMTP_*` (when smtp) |
+| `WEBHOOK_ALLOW_PRIVATE` · `INBOUND_WEBHOOK_SECRET` | Webhook settings |
+| `ANTHROPIC_API_KEY` | **Optional** — without it AI endpoints return 503 |
+| `AI_MODEL` | AI model (default `claude-opus-4-8`) |
 
 ---
 
-## Test & kalite
+## Tests & quality
 
 ```bash
 cd backend
-npm run lint        # ESLint (0 uyarı)
-npm run build       # production derleme
-npm run test        # 106 birim testi
-npm run test:e2e    # 108 E2E testi (gerçek PostgreSQL)
-npm run test:cov    # kapsam
+npm run lint        # ESLint (0 warnings)
+npm run build       # production build
+npm run test        # 106 unit tests
+npm run test:e2e    # 108 E2E tests (real PostgreSQL)
+npm run test:cov    # coverage
 ```
 
-**Durum:** 106 birim + 108 E2E yeşil · lint/build temiz. **Negatif testler birinci sınıf**:
-IDOR, privilege escalation, enumeration, cross-tenant erişim engeli, finansal maskeleme,
-fatura immutability, çift dönüşüm engeli, dedup, AI key-yok 503 senaryoları.
+**Status:** 106 unit + 108 E2E green · lint/build clean. **Negative tests are first-class**:
+IDOR, privilege escalation, enumeration, cross-tenant access blocking, financial masking,
+invoice immutability, double-conversion blocking, dedup, and AI no-key 503 scenarios.
 
 ---
 
-## Proje yapısı
+## Project structure
 
 ```
 .
 ├── backend/                # NestJS API
-│   ├── prisma/             # şema + migration'lar + seed/seed-demo
+│   ├── prisma/             # schema + migrations + seed/seed-demo
 │   └── src/
-│       ├── common/         # guard, interceptor, filter, decorator, tenant ALS
-│       ├── config/         # Joi env doğrulama
+│       ├── common/         # guards, interceptors, filters, decorators, tenant ALS
+│       ├── config/         # Joi env validation
 │       └── modules/        # auth, users, roles, deals, leads, companies,
 │                           # contacts, meetings, invoices, products, quotes,
 │                           # ai, automation, custom-fields, reports,
 │                           # integrations, data, audit, search, gdpr, tenants
-├── frontend/               # Next.js 14 (App Router, Atomic Design)
-│   ├── app/(dashboard)/    # sayfalar: deals, leads, companies, contacts,
-│   │                       # invoices, products, quotes, reports, ai, data,
-│   │                       # search, audit, tenants, users
-│   └── src/components/     # atoms → molecules → organisms → templates
-└── docs/                   # mimari, fazlar (01–11), güvenlik, test stratejisi
+└── frontend/               # Next.js 14 (App Router, Atomic Design)
+    ├── app/(dashboard)/    # pages: deals, leads, companies, contacts,
+    │                       # invoices, products, quotes, reports, ai, data,
+    │                       # search, audit, roles, custom-fields, automation,
+    │                       # tenants, users
+    └── src/components/     # atoms → molecules → organisms → templates
 ```
 
 ---
 
-## Bilinçli sınırlar (dürüstlük notu)
+## Known limitations (honest notes)
 
-Şeffaflık için tamamlanmamış/kademeli bırakılan noktalar:
+For transparency, parts intentionally left incomplete/staged:
 
-- **In-app bildirim** (Notification) yapılmadı — event bus + kullanıcı hedefleme tasarımı gerektiriyor; ayrı bir alt-faza alındı.
-- **Multi-tenancy:** Postgres satır düzeyi güvenlik (RLS) yerine **uygulama katmanı** Prisma `$use` tenant filtresi tercih edildi. **Subdomain** çözümleme backend'de yok (tenant JWT claim ile). **Per-tenant numara benzersizliği** yok (fatura/teklif numarası global unique).
-- **Webhook retry** için `processDuePending()` hazır ancak worker/cron zamanlanmadı.
+- **In-app notifications** not built — needs an event-bus + user-targeting design; deferred to a separate sub-phase.
+- **Multi-tenancy:** an **application-layer** Prisma `$use` tenant filter is used instead of Postgres row-level security (RLS). **Subdomain** resolution is not done in the backend (tenant comes from the JWT claim). There is **no per-tenant number uniqueness** (invoice/quote numbers are globally unique).
+- **Webhook retry**: `processDuePending()` is ready but no worker/cron is scheduled.
 
 ---
 
-## Dokümantasyon
+## Built with Claude Code
 
-- [Mimari Genel Bakış](./docs/00-mimari-genel-bakis.md)
-- [Faz dokümanları 01–06](./docs) · [v2 fazları](./docs/11-v2-fazlar.md)
-- [Pazar karşılaştırması & v2 yol haritası](./docs/10-pazar-karsilastirma-ve-v2.md)
-- [Güvenlik Standartları](./docs/90-guvenlik-standartlari.md) · [Test Stratejisi](./docs/91-test-stratejisi.md)
-- [Dürüstlük & Çalışma Tarzı](./docs/02-durustluk-ve-calisma-tarzi.md)
+This project was designed and implemented with the help of
+[**Claude Code**](https://claude.com/claude-code), Anthropic's agentic coding tool
+(model: Claude Opus 4.8). Architecture decisions, the phased roadmap, the NestJS/Next.js
+implementation, the test suite, and this documentation were produced in a
+human-in-the-loop workflow.
 
-## Katkı
+Per Anthropic's recommended attribution, commits co-authored by the assistant carry a
+trailer:
 
-Katkılar memnuniyetle karşılanır — bkz. [CONTRIBUTING.md](./CONTRIBUTING.md). Her PR:
-lint + birim + entegrasyon + güvenlik (negatif) testleri yeşil olmalı; mimari ihlal yok
-(Prisma yalnız repository; Atomic katmanlar); panele dokunan işlerde ilgili docs güncel.
+```
+Co-Authored-By: Claude <noreply@anthropic.com>
+```
 
-## Lisans
+The AI feature module (`backend/src/modules/ai`) also calls the Claude API at runtime
+via the Anthropic SDK — but that is optional and unrelated to how the code was authored
+(see [Artificial intelligence (Claude)](#-artificial-intelligence-claude)).
+
+---
+
+## Contributing
+
+Contributions are welcome — see [CONTRIBUTING.md](./CONTRIBUTING.md). Every PR must keep
+lint + unit + integration + security (negative) tests green; no architectural violations
+(Prisma only in repositories; Atomic layers on the frontend).
+
+## License
 
 [MIT](./LICENSE)
