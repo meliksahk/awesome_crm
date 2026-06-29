@@ -24,7 +24,7 @@ const BASE: CrudField[] = [
   { key: 'firstName', label: 'Ad', required: true },
   { key: 'lastName', label: 'Soyad', required: true },
   { key: 'email', label: 'E-posta', type: 'email' },
-  { key: 'phone', label: 'Telefon' },
+  { key: 'phone', label: 'Telefon', type: 'phone' },
   { key: 'companyName', label: 'Şirket' },
   { key: 'source', label: 'Kaynak', placeholder: 'WEB / REFERRAL / EVENT' },
 ];

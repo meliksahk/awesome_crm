@@ -16,7 +16,7 @@ const FIELDS: CrudField[] = [
   { key: 'name', label: 'Ad', required: true },
   { key: 'domain', label: 'Alan adı', placeholder: 'firma.com' },
   { key: 'industry', label: 'Sektör' },
-  { key: 'phone', label: 'Telefon' },
+  { key: 'phone', label: 'Telefon', type: 'phone' },
   { key: 'website', label: 'Web sitesi', placeholder: 'https://…' },
 ];
 

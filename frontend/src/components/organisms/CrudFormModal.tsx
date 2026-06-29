@@ -7,6 +7,7 @@ import { useI18n } from '@/lib/i18n';
 import { Modal } from '../molecules/Modal';
 import { FormField } from '../molecules/FormField';
 import { Textarea } from '../atoms/Textarea';
+import { PhoneNumberField } from '../atoms/PhoneNumberField';
 import { Button } from '../atoms/Button';
 
 export interface CrudField {
@@ -16,6 +17,7 @@ export interface CrudField {
     | 'text'
     | 'email'
     | 'password'
+    | 'phone'
     | 'number'
     | 'select'
     | 'date'
@@ -136,6 +138,13 @@ export function CrudFormModal({
                   onChange={(e) => set(f.key, e.target.value)}
                 />
               </>
+            ) : f.type === 'phone' ? (
+              <PhoneNumberField
+                id={`cf-${f.key}`}
+                label={f.label + (f.required ? ' *' : '')}
+                value={vals[f.key]}
+                onChange={(v) => set(f.key, v)}
+              />
             ) : (
               <FormField
                 id={`cf-${f.key}`}

@@ -6,6 +6,7 @@ import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { Modal } from '../molecules/Modal';
 import { FormField } from '../molecules/FormField';
+import { PhoneNumberField } from '../atoms/PhoneNumberField';
 import { Button } from '../atoms/Button';
 import type { Board, Deal } from '@/types';
 
@@ -109,11 +110,11 @@ export function DealEditModal({
           value={form.email}
           onChange={(e) => set('email', e.target.value)}
         />
-        <FormField
+        <PhoneNumberField
           id="e-phone"
           label="Telefon"
           value={form.phone}
-          onChange={(e) => set('phone', e.target.value)}
+          onChange={(v) => set('phone', v)}
         />
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-600">

@@ -1,3 +1,6 @@
+/* Uluslararası telefon girişi (react-phone-number-input) stilleri */
+@import 'react-phone-number-input/style.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

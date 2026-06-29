@@ -10,6 +10,7 @@ import { DealEditModal } from '@/components/organisms/DealEditModal';
 import { Spinner } from '@/components/atoms/Spinner';
 import { Button } from '@/components/atoms/Button';
 import { FormField } from '@/components/molecules/FormField';
+import { PhoneNumberField } from '@/components/atoms/PhoneNumberField';
 import { Card } from '@/components/atoms/Card';
 import type { Board, Deal } from '@/types';
 
@@ -153,12 +154,11 @@ export default function DealsPage() {
                 value={form.email}
                 onChange={(e) => set('email', e.target.value)}
               />
-              <FormField
+              <PhoneNumberField
                 id="deal-phone"
                 label="Telefon"
-                placeholder="+90 5xx xxx xx xx"
                 value={form.phone}
-                onChange={(e) => set('phone', e.target.value)}
+                onChange={(v) => set('phone', v)}
               />
             </div>
           )}

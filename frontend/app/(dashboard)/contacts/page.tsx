@@ -40,7 +40,7 @@ export default function ContactsPage() {
     { key: 'firstName', label: 'Ad', required: true },
     { key: 'lastName', label: 'Soyad', required: true },
     { key: 'email', label: 'E-posta', type: 'email' },
-    { key: 'phone', label: 'Telefon' },
+    { key: 'phone', label: 'Telefon', type: 'phone' },
     { key: 'title', label: 'Ünvan' },
     {
       key: 'companyId',
