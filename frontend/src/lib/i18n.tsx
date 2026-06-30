@@ -413,6 +413,18 @@ export const en: Dict = {
   'dash.quickLinks': 'Quick links',
   'lead.convertTitle': 'Convert to deal',
   'lead.convertHint': 'Optional — adjust the deal details, then convert.',
+  // Branding
+  'nav.branding': 'Branding',
+  'page.branding': 'Branding & logo',
+  'brand.appName': 'App name',
+  'brand.logo': 'Logo',
+  'brand.upload': 'Upload image (SVG / PNG / JPG)',
+  'brand.pasteSvg': 'or paste SVG code',
+  'brand.preview': 'Preview',
+  'brand.reset': 'Reset to default',
+  'brand.tooLarge': 'Image too large (max ~400 KB). Use a smaller / optimized file.',
+  'brand.hint':
+    'Shown on the login screen and the sidebar. The logo is rendered as an image, so embedded scripts never run.',
 };
 
 // --- Türkçe ---
@@ -809,6 +821,18 @@ export const tr: Dict = {
   'dash.quickLinks': 'Kısayollar',
   'lead.convertTitle': 'Anlaşmaya dönüştür',
   'lead.convertHint': 'Opsiyonel — anlaşma bilgilerini düzenleyip dönüştürün.',
+  // Marka
+  'nav.branding': 'Marka',
+  'page.branding': 'Marka & logo',
+  'brand.appName': 'Uygulama adı',
+  'brand.logo': 'Logo',
+  'brand.upload': 'Görsel yükle (SVG / PNG / JPG)',
+  'brand.pasteSvg': 'ya da SVG kodu yapıştır',
+  'brand.preview': 'Önizleme',
+  'brand.reset': 'Varsayılana sıfırla',
+  'brand.tooLarge': 'Görsel çok büyük (~400 KB sınırı). Daha küçük/optimize dosya kullanın.',
+  'brand.hint':
+    'Giriş ekranında ve kenar menüde görünür. Logo görsel olarak render edilir; içine gömülü scriptler çalışmaz.',
 };
 
 const BUILTIN: Record<string, { name: string; dict: Dict }> = {

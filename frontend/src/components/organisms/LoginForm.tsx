@@ -8,6 +8,7 @@ import { useI18n } from '@/lib/i18n';
 import { Button } from '../atoms/Button';
 import { Card } from '../atoms/Card';
 import { FormField } from '../molecules/FormField';
+import { Logo } from '../molecules/Logo';
 
 export function LoginForm() {
   const { login } = useAuth();
@@ -38,9 +39,9 @@ export function LoginForm() {
 
   return (
     <Card className="w-full max-w-sm p-8">
-      <h1 className="mb-1 text-xl font-semibold text-gray-900">
-        Açık Kaynak CRM
-      </h1>
+      <div className="mb-4">
+        <Logo size={36} textClass="text-xl text-gray-900" />
+      </div>
       <p className="mb-6 text-sm text-gray-500">{t('login.title')}</p>
       <form onSubmit={onSubmit} className="space-y-4">
         <FormField

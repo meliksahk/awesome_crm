@@ -6,6 +6,7 @@ import { useAuth } from '@/lib/auth';
 import { useI18n } from '@/lib/i18n';
 import { NavItem } from '../molecules/NavItem';
 import { NavSection } from '../molecules/NavSection';
+import { Logo } from '../molecules/Logo';
 
 const LS_KEY = 'crm_nav_open';
 
@@ -42,8 +43,8 @@ export function Sidebar() {
 
   return (
     <aside className="flex w-56 flex-col bg-gray-900 p-4">
-      <div className="mb-4 px-2 text-lg font-bold text-white">
-        {t('app.title')}
+      <div className="mb-4 px-2">
+        <Logo size={28} textClass="text-base text-white" />
       </div>
       <nav className="flex-1 space-y-1 overflow-y-auto">
         {/* Genel (her zaman görünür) */}
@@ -115,6 +116,9 @@ export function Sidebar() {
         </NavSection>
 
         <NavSection title={t('nav.grpPrefs')} {...sec('prefs')}>
+          {can('branding.manage') && (
+            <NavItem href="/branding" label={t('nav.branding')} />
+          )}
           <NavItem href="/language" label={t('nav.language')} />
         </NavSection>
       </nav>
