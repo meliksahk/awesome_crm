@@ -411,6 +411,8 @@ export const en: Dict = {
   'rep.unassigned': 'Unassigned',
   'rep.qty': 'qty',
   'dash.quickLinks': 'Quick links',
+  'lead.convertTitle': 'Convert to deal',
+  'lead.convertHint': 'Optional — adjust the deal details, then convert.',
 };
 
 // --- Türkçe ---
@@ -805,6 +807,8 @@ export const tr: Dict = {
   'rep.unassigned': 'Atanmamış',
   'rep.qty': 'adet',
   'dash.quickLinks': 'Kısayollar',
+  'lead.convertTitle': 'Anlaşmaya dönüştür',
+  'lead.convertHint': 'Opsiyonel — anlaşma bilgilerini düzenleyip dönüştürün.',
 };
 
 const BUILTIN: Record<string, { name: string; dict: Dict }> = {

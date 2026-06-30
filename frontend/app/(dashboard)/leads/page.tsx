@@ -1,13 +1,14 @@
 'use client';
 // app/(dashboard)/leads/page.tsx — nitelenmemiş Lead tam CRUD + dönüştür (i18n).
 import { useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, unwrap } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { useI18n } from '@/lib/i18n';
 import { DashboardTemplate } from '@/components/templates/DashboardTemplate';
 import { DataTable, Column } from '@/components/organisms/DataTable';
 import { CrudFormModal, CrudField } from '@/components/organisms/CrudFormModal';
+import { ConvertLeadModal } from '@/components/organisms/ConvertLeadModal';
 import { Badge } from '@/components/atoms/Badge';
 import { Button } from '@/components/atoms/Button';
 import { Spinner } from '@/components/atoms/Spinner';
@@ -64,6 +65,7 @@ export default function LeadsPage() {
   const qc = useQueryClient();
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<UnqualifiedLead | null>(null);
+  const [converting, setConverting] = useState<UnqualifiedLead | null>(null);
   const [fChannel, setFChannel] = useState('');
   const [fStatus, setFStatus] = useState('');
   const [fSource, setFSource] = useState('');
@@ -81,11 +83,6 @@ export default function LeadsPage() {
     },
   });
   const invalidate = () => qc.invalidateQueries({ queryKey: ['leads'] });
-
-  const convert = useMutation({
-    mutationFn: (id: string) => api.post(`/leads/${id}/convert`),
-    onSuccess: invalidate,
-  });
 
   const columns: Column<UnqualifiedLead>[] = [
     { key: 'name', header: t('col.name'), render: (r) => `${r.firstName} ${r.lastName}` },
@@ -115,9 +112,8 @@ export default function LeadsPage() {
             className="px-2 py-1 text-xs"
             onClick={(e) => {
               e.stopPropagation();
-              convert.mutate(r.id);
+              setConverting(r);
             }}
-            disabled={convert.isPending}
           >
             {t('act.convert')}
           </Button>
@@ -221,6 +217,14 @@ export default function LeadsPage() {
                 }
               : undefined
           }
+        />
+      )}
+
+      {converting && (
+        <ConvertLeadModal
+          lead={converting}
+          onClose={() => setConverting(null)}
+          onConverted={invalidate}
         />
       )}
     </DashboardTemplate>
