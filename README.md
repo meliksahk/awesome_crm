@@ -43,7 +43,7 @@ reports, signed webhooks, AI assistant, and multi-tenancy.
 
 ## What it offers
 
-Açık Kaynak CRM delivers an end-to-end CRM experience — from sales-pipeline
+Awesome CRM delivers an end-to-end CRM experience — from sales-pipeline
 management to invoicing, from AI-assisted sales helpers to multi-tenant isolation.
 All business logic is **API-First**; the Next.js panel consumes that API. Every
 endpoint is **secure by default**, and authorization is verified on every request
