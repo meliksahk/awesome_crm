@@ -6,6 +6,10 @@
 
 NestJS + PostgreSQL/Prisma backend · Next.js 14 (App Router) + Atomic Design frontend · Docker
 
+A free, self-hosted CRM alternative built with NestJS and Next.js — leads & web-to-lead forms,
+sales pipeline with a Kanban board, contacts & companies, quotes (CPQ) and invoicing, chart-rich
+reports, signed webhooks, AI assistant, and multi-tenancy.
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Backend](https://img.shields.io/badge/Backend-NestJS-e0234e.svg)](https://nestjs.com)
 [![Frontend](https://img.shields.io/badge/Frontend-Next.js%2014-black.svg)](https://nextjs.org)
