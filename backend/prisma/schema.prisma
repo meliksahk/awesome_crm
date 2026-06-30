@@ -578,3 +578,11 @@ model AuditLog {
   @@index([entity, createdAt])
   @@index([createdAt])
 }
+
+// ===== Marka (logo + uygulama adı) — panelden değiştirilebilir, tekil satır =====
+model Branding {
+  id        String   @id @default("singleton")
+  appName   String?
+  logo      String?  @db.Text // data URL (image/svg+xml veya png) — boşsa varsayılan logo
+  updatedAt DateTime @updatedAt
+}

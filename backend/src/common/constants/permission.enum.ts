@@ -40,6 +40,10 @@ export const PERMISSIONS = {
     READ: 'pipeline.read',
     MANAGE: 'pipeline.manage',
   },
+  // Marka (logo + uygulama adı) yönetimi
+  BRANDING: {
+    MANAGE: 'branding.manage',
+  },
   INVOICE: {
     CREATE: 'invoice.create',
     READ: 'invoice.read',
