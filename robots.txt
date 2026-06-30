@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://meliksahk.github.io/awesome-crm/sitemap.xml
+Sitemap: https://meliksahk.github.io/awesome_crm/sitemap.xml
