@@ -59,7 +59,7 @@ from the live source through a two-layer **role + permission** model.
 - **Pipeline + Kanban**: collision-free drag-and-drop via fractional ranking; atomic stage/order change (single transaction) + activity log.
 - **Configurable stages**: add / rename / reorder / delete Kanban columns from the panel (`/pipeline`); Won/Lost flags; delete is guarded (last stage or stages referenced by deals are blocked).
 - **Deal**: CRUD, ownership-based access, status (OPEN/WON/LOST), activities (NOTE/CALL/EMAIL/STAGE_CHANGE).
-- **Lead (unqualified)** → `convert` flow into Contact + Company + Deal.
+- **Lead (unqualified)**: status (`NEW`/`WORKING`/`QUALIFIED`/`UNQUALIFIED`) is set manually via the edit dialog; `CONVERTED` is set only by the convert flow. **Convert** opens a pre-filled deal dialog where you can optionally adjust title, value/currency, company, contact and target stage before turning the lead into Contact + Company + Deal.
 - **Lead intake & source tracking**: every lead records a structured **channel** (`MANUAL` / `IMPORT` / `FORM` / `WEBHOOK` / `API`) alongside the free-text sub-source, and is filterable by channel/status/source.
   - **Embeddable form builder**: configure fields, button color & label, success message and redirect; embed on any external site via an `<iframe>` snippet. Submissions are unsigned/public and land as `FORM` leads (with custom fields captured into `meta`).
   - **Inbound lead webhook**: server-to-server endpoint per form; **HMAC-SHA256 signature is mandatory** (`x-crm-signature` / `x-crm-timestamp`) — an invalid or missing signature returns `401` with no DB write. Lands as a `WEBHOOK` lead.
