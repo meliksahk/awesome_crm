@@ -425,6 +425,23 @@ export const en: Dict = {
   'brand.tooLarge': 'Image too large (max ~400 KB). Use a smaller / optimized file.',
   'brand.hint':
     'Shown on the login screen and the sidebar. The logo is rendered as an image, so embedded scripts never run.',
+  // Connections (v3)
+  'nav.connections': 'Connections',
+  'page.connections': 'Connections',
+  'conn.hint':
+    'Connect external services (WhatsApp, Stripe, accounting…) from here. Secrets are encrypted at rest and never shown again.',
+  'conn.cryptoMissing':
+    'Set APP_ENCRYPTION_KEY on the server to store integration secrets securely.',
+  'conn.connect': 'Connect',
+  'conn.connected': 'Connected',
+  'conn.disabled': 'Disabled',
+  'conn.comingSoon': 'Coming soon',
+  'conn.test': 'Test',
+  'conn.deleteConfirm': 'Disconnect this integration?',
+  'conn.catMessaging': 'Messaging',
+  'conn.catPayments': 'Payments',
+  'conn.catAccounting': 'Accounting',
+  'conn.catOther': 'Other',
 };
 
 // --- Türkçe ---
@@ -833,6 +850,23 @@ export const tr: Dict = {
   'brand.tooLarge': 'Görsel çok büyük (~400 KB sınırı). Daha küçük/optimize dosya kullanın.',
   'brand.hint':
     'Giriş ekranında ve kenar menüde görünür. Logo görsel olarak render edilir; içine gömülü scriptler çalışmaz.',
+  // Bağlantılar (v3)
+  'nav.connections': 'Bağlantılar',
+  'page.connections': 'Bağlantılar',
+  'conn.hint':
+    'Dış servisleri (WhatsApp, Stripe, muhasebe…) buradan bağlayın. Sırlar şifreli saklanır ve bir daha gösterilmez.',
+  'conn.cryptoMissing':
+    'Entegrasyon sırlarını güvenle saklamak için sunucuda APP_ENCRYPTION_KEY tanımlayın.',
+  'conn.connect': 'Bağla',
+  'conn.connected': 'Bağlı',
+  'conn.disabled': 'Pasif',
+  'conn.comingSoon': 'Yakında',
+  'conn.test': 'Test',
+  'conn.deleteConfirm': 'Bu bağlantı kaldırılsın mı?',
+  'conn.catMessaging': 'Mesajlaşma',
+  'conn.catPayments': 'Ödemeler',
+  'conn.catAccounting': 'Muhasebe',
+  'conn.catOther': 'Diğer',
 };
 
 const BUILTIN: Record<string, { name: string; dict: Dict }> = {

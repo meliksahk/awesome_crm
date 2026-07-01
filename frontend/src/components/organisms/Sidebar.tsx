@@ -100,6 +100,9 @@ export function Sidebar() {
             <NavItem href="/custom-fields" label={t('nav.customFields')} />
           )}
           {can('integration.read') && (
+            <NavItem href="/connections" label={t('nav.connections')} />
+          )}
+          {can('integration.read') && (
             <NavItem href="/integrations" label={t('nav.integrations')} />
           )}
         </NavSection>
