@@ -53,4 +53,8 @@ export const envValidationSchema = Joi.object({
   // --- v2.6: AI (Claude) opsiyonel ---
   ANTHROPIC_API_KEY: Joi.string().allow('').optional(),
   AI_MODEL: Joi.string().optional(),
+
+  // --- v3.0: Entegrasyon bağlantıları — panel sırlarını AES-256-GCM ile şifreler.
+  // base64 kodlu 32 baytlık anahtar. Yoksa bağlantı sır işlemleri açık hata döner (fail-safe).
+  APP_ENCRYPTION_KEY: Joi.string().allow('').optional(),
 });

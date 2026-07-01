@@ -586,3 +586,19 @@ model Branding {
   logo      String?  @db.Text // data URL (image/svg+xml veya png) — boşsa varsayılan logo
   updatedAt DateTime @updatedAt
 }
+
+// ===== v3.0 — Entegrasyon bağlantıları (panelden bağlanır; sırlar AES-256-GCM şifreli) =====
+model Connection {
+  id         String   @id @default(uuid())
+  tenantId   String?
+  provider   String // 'whatsapp' | 'stripe' | 'quickbooks' | ...
+  label      String?
+  status     String   @default("connected") // connected | disabled
+  secretsEnc String?  @db.Text // AES-256-GCM şifreli JSON (sır alanları) — asla düz saklanmaz
+  config     Json? // gizli olmayan meta (ör. phoneNumberId)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([tenantId])
+  @@index([provider])
+}

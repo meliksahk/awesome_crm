@@ -31,4 +31,5 @@ export const TENANT_MODELS = new Set<string>([
   'Product',
   'Quote',
   'LeadForm',
+  'Connection',
 ]);
