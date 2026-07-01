@@ -94,6 +94,7 @@ from the live source through a two-layer **role + permission** model.
 - Pipeline value, period/status summaries, **weighted forecast** by stage probability, financial invoice summary (permission-gated).
 
 ### 🔗 Integration & data
+- **Connections (panel-connectable integrations)**: connect external services from `/connections` — WhatsApp Business and Stripe live (test-ping), QuickBooks/Xero/iyzico scaffolded. Secrets are stored **AES-256-GCM encrypted** at rest (`APP_ENCRYPTION_KEY`) and never returned by the API.
 - **Outbound webhooks**: subscribe to events (`deal.created/moved`, `invoice.issued/paid`) and manage them in-panel (`/integrations`) — create with a one-time signing secret, send a test event, inspect delivery history. HMAC-SHA256 signature, replay window, idempotency, SSRF protection; the panel documents how the receiver verifies the signature.
 - **Email**: `simulated` and real `smtp` (nodemailer) drivers + template engine + EmailLog.
 - **CSV import/export**: export contacts/companies/deals; import contacts/companies (**dedup** + per-row errors).
@@ -174,6 +175,7 @@ All endpoints are served under the `/api/v1` prefix (Swagger: `/api/docs`).
 | **Automation** | `/automation/rules` |
 | **Custom fields** | `/custom-fields` |
 | **Reports** | `/reports/{pipeline,deals/summary,forecast,invoices/summary}` · `revenue/monthly` · `sales/by-owner` · `products/top` · `deals/won-lost` |
+| **Connections** | `GET /connections/catalog` · `GET/POST /connections` · `POST /connections/:id/test` · `PATCH/DELETE /connections/:id` |
 | **Integrations** | `/integrations/webhooks` (+ inbound webhook HMAC verification) |
 | **Data** | `GET /data/export/:entity` · `POST /data/import/:entity` · `/data/duplicates/:entity` · `/data/merge/:entity` |
 | **Platform** | `/audit-logs` · `GET /search?q=` · `/gdpr/contacts/:id/{export,erase}` · `/tenants` (+ `:id/assign-user`) |
