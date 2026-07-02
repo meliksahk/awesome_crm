@@ -4,6 +4,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { AutomationRepository } from './automation.repository';
 import { MailService } from '../integrations/mail/mail.service';
+import { WhatsAppService } from '../whatsapp/whatsapp.service';
 
 type Payload = Record<string, unknown>;
 interface Condition {
@@ -26,6 +27,15 @@ export function evaluateConditions(
   return String(payload[conditions.field]) === String(conditions.equals);
 }
 
+// Saf: "{{alan}}" yer tutucularını payload değerleriyle doldur (whatsapp/e-posta gövdesi).
+export function interpolate(templateText: string, payload: Payload): string {
+  return templateText.replace(/\{\{(\w+)\}\}/g, (_, key: string) =>
+    payload[key] === undefined || payload[key] === null
+      ? ''
+      : String(payload[key]),
+  );
+}
+
 @Injectable()
 export class AutomationEngine {
   private readonly logger = new Logger(AutomationEngine.name);
@@ -33,6 +43,7 @@ export class AutomationEngine {
   constructor(
     private readonly repo: AutomationRepository,
     private readonly mail: MailService,
+    private readonly whatsapp: WhatsAppService,
   ) {}
 
   @OnEvent('deal.created')
@@ -90,6 +101,18 @@ export class AutomationEngine {
       case 'send_email': {
         if (action.to && action.template) {
           await this.mail.sendTemplate(action.to, action.template, payload);
+        }
+        return;
+      }
+      case 'send_whatsapp': {
+        // Alıcı: sabit numara (action.to) yoksa payload'daki telefon (örn. lead.created).
+        const to = action.to || (payload.phone as string | undefined);
+        if (to && action.note) {
+          await this.whatsapp.send({
+            to,
+            body: interpolate(action.note, payload),
+            leadId: (payload.leadId as string | undefined) ?? null,
+          });
         }
         return;
       }

@@ -41,6 +41,19 @@ export const PROVIDERS: ProviderDef[] = [
         secret: false,
         required: true,
       },
+      // Gelen webhook için (opsiyonel): imza doğrulama + Meta verify challenge.
+      {
+        key: 'appSecret',
+        label: 'App Secret (inbound)',
+        secret: true,
+        required: false,
+      },
+      {
+        key: 'verifyToken',
+        label: 'Verify Token (inbound)',
+        secret: true,
+        required: false,
+      },
     ],
   },
   {

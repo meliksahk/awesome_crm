@@ -110,6 +110,33 @@ export class ConnectionsService {
     return { deleted: true };
   }
 
+  // İÇ KULLANIM (HTTP'ye açılmaz): bağlı & aktif sağlayıcının çözülmüş kimlik bilgileri.
+  // Bağlı değilse null döner — çağıran taraf kullanıcıya anlaşılır hata üretir.
+  async getCredentials(provider: string): Promise<{
+    id: string;
+    secrets: Record<string, string>;
+    config: Record<string, unknown>;
+  } | null> {
+    const row = (await this.repo.findByProvider(provider)) as ConnRow | null;
+    if (!row || row.status !== 'connected') return null;
+    if (!this.crypto.isConfigured()) return null;
+    let secrets: Record<string, string> = {};
+    if (row.secretsEnc) {
+      try {
+        secrets = this.crypto.decryptJson<Record<string, string>>(
+          row.secretsEnc,
+        );
+      } catch {
+        return null;
+      }
+    }
+    return {
+      id: row.id,
+      secrets,
+      config: (row.config ?? {}) as Record<string, unknown>,
+    };
+  }
+
   private async getOrThrow(id: string): Promise<ConnRow> {
     const row = (await this.repo.findById(id)) as ConnRow | null;
     if (!row) throw new NotFoundException('Bağlantı bulunamadı.');

@@ -32,4 +32,5 @@ export const TENANT_MODELS = new Set<string>([
   'Quote',
   'LeadForm',
   'Connection',
+  'WhatsAppMessage',
 ]);

@@ -7,6 +7,7 @@ import {
   Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { LeadChannel, LeadStatus, Prisma } from '@prisma/client';
 import { AuthenticatedUser } from '../../common/decorators/current-user.decorator';
 import { LeadsRepository } from './leads.repository';
@@ -36,7 +37,10 @@ export interface IntakeLeadInput {
 export class LeadsService {
   private readonly logger = new Logger(LeadsService.name);
 
-  constructor(private readonly repo: LeadsRepository) {}
+  constructor(
+    private readonly repo: LeadsRepository,
+    private readonly events: EventEmitter2,
+  ) {}
 
   async create(dto: CreateLeadDto, actor: AuthenticatedUser) {
     // Panelden elle oluşturma → MANUAL kanal.
@@ -45,6 +49,7 @@ export class LeadsService {
       channel: LeadChannel.MANUAL,
       ownerId: actor.id,
     });
+    this.emitCreated(lead);
     return lead;
   }
 
@@ -68,7 +73,31 @@ export class LeadsService {
     this.logger.log(
       `lead.intake channel=${input.channel} form=${input.formId ?? '-'} lead=${lead.id}`,
     );
+    this.emitCreated(lead);
     return lead;
+  }
+
+  // Otomasyon/webhook tetikleyicileri için domain olayı (örn. WhatsApp karşılama).
+  private emitCreated(lead: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string | null;
+    phone: string | null;
+    companyName: string | null;
+    channel: LeadChannel;
+    source: string | null;
+  }) {
+    this.events.emit('lead.created', {
+      leadId: lead.id,
+      firstName: lead.firstName,
+      lastName: lead.lastName,
+      email: lead.email,
+      phone: lead.phone,
+      companyName: lead.companyName,
+      channel: lead.channel,
+      source: lead.source,
+    });
   }
 
   async findAll(q: QueryLeadDto) {

@@ -21,6 +21,7 @@ import { LeadFormsModule } from './modules/lead-forms/lead-forms.module';
 import { PipelinesModule } from './modules/pipelines/pipelines.module';
 import { BrandingModule } from './modules/branding/branding.module';
 import { ConnectionsModule } from './modules/connections/connections.module';
+import { WhatsAppModule } from './modules/whatsapp/whatsapp.module';
 import { InvoicesModule } from './modules/invoices/invoices.module';
 import { IntegrationsModule } from './modules/integrations/integrations.module';
 import { HealthModule } from './modules/health/health.module';
@@ -67,6 +68,7 @@ import { TenantMiddleware } from './common/tenant/tenant.middleware';
     PipelinesModule,
     BrandingModule,
     ConnectionsModule,
+    WhatsAppModule,
     InvoicesModule,
     IntegrationsModule,
     HealthModule,

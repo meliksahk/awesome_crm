@@ -23,7 +23,12 @@ export const TRIGGERS = [
   'invoice.issued',
 ] as const;
 
-export const ACTION_TYPES = ['create_activity', 'send_email', 'log'] as const;
+export const ACTION_TYPES = [
+  'create_activity',
+  'send_email',
+  'send_whatsapp',
+  'log',
+] as const;
 
 export class ActionDto {
   @ApiProperty({ enum: ACTION_TYPES })

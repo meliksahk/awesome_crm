@@ -5,9 +5,10 @@ import { AutomationService } from './automation.service';
 import { AutomationRepository } from './automation.repository';
 import { AutomationEngine } from './automation.engine';
 import { IntegrationsModule } from '../integrations/integrations.module';
+import { WhatsAppModule } from '../whatsapp/whatsapp.module';
 
 @Module({
-  imports: [IntegrationsModule], // MailService için
+  imports: [IntegrationsModule, WhatsAppModule], // MailService + WhatsAppService
   controllers: [AutomationController],
   providers: [AutomationService, AutomationRepository, AutomationEngine],
   exports: [AutomationService],

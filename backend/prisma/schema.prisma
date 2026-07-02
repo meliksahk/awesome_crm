@@ -602,3 +602,23 @@ model Connection {
   @@index([tenantId])
   @@index([provider])
 }
+
+// ===== v3.1 — WhatsApp mesajları (gönderilen + gelen; lead/contact'a bağlanır) =====
+model WhatsAppMessage {
+  id        String   @id @default(uuid())
+  tenantId  String?
+  direction String // IN | OUT
+  phone     String // karşı tarafın numarası (E.164, + olmadan da olabilir)
+  body      String   @db.Text
+  status    String   @default("sent") // sent | failed | received
+  error     String?
+  waId      String? // sağlayıcı mesaj id'si (wamid...)
+  leadId    String?
+  contactId String?
+  createdAt DateTime @default(now())
+
+  @@index([phone, createdAt])
+  @@index([leadId])
+  @@index([contactId])
+  @@index([tenantId])
+}
