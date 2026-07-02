@@ -442,6 +442,25 @@ export const en: Dict = {
   'conn.catPayments': 'Payments',
   'conn.catAccounting': 'Accounting',
   'conn.catOther': 'Other',
+  // WhatsApp (v3.1)
+  'nav.whatsapp': 'WhatsApp',
+  'page.whatsapp': 'WhatsApp inbox',
+  'wa.send': 'Send',
+  'wa.sendVia': 'Send via WhatsApp',
+  'wa.message': 'Message',
+  'wa.notConnected':
+    'WhatsApp is not connected. Connect it on the Connections page.',
+  'wa.sent': 'Message sent.',
+  'wa.failed': 'Send failed',
+  'wa.empty': 'No conversations yet.',
+  'wa.reply': 'Reply…',
+  'wa.linkedLead': 'Lead',
+  'wa.linkedContact': 'Contact',
+  'wa.quoteMsg':
+    'Hello {name}, your quote {number} totaling {total} {currency} is ready.',
+  'wa.invoiceMsg':
+    'Hello {name}, your invoice {number} totaling {total} {currency} has been issued.',
+  'auto.sendWhatsappHint': 'Recipient (blank = phone from event)',
 };
 
 // --- Türkçe ---
@@ -867,6 +886,25 @@ export const tr: Dict = {
   'conn.catPayments': 'Ödemeler',
   'conn.catAccounting': 'Muhasebe',
   'conn.catOther': 'Diğer',
+  // WhatsApp (v3.1)
+  'nav.whatsapp': 'WhatsApp',
+  'page.whatsapp': 'WhatsApp gelen kutusu',
+  'wa.send': 'Gönder',
+  'wa.sendVia': "WhatsApp'la gönder",
+  'wa.message': 'Mesaj',
+  'wa.notConnected':
+    'WhatsApp bağlı değil. Bağlantılar sayfasından bağlayın.',
+  'wa.sent': 'Mesaj gönderildi.',
+  'wa.failed': 'Gönderim başarısız',
+  'wa.empty': 'Henüz sohbet yok.',
+  'wa.reply': 'Yanıtla…',
+  'wa.linkedLead': 'Lead',
+  'wa.linkedContact': 'Kişi',
+  'wa.quoteMsg':
+    'Merhaba {name}, {total} {currency} tutarındaki {number} numaralı teklifiniz hazır.',
+  'wa.invoiceMsg':
+    'Merhaba {name}, {total} {currency} tutarındaki {number} numaralı faturanız kesildi.',
+  'auto.sendWhatsappHint': 'Alıcı (boş = olaydaki telefon)',
 };
 
 const BUILTIN: Record<string, { name: string; dict: Dict }> = {

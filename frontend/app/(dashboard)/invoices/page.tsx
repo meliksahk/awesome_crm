@@ -8,6 +8,7 @@ import { useI18n } from '@/lib/i18n';
 import { DashboardTemplate } from '@/components/templates/DashboardTemplate';
 import { DataTable, Column } from '@/components/organisms/DataTable';
 import { CrudFormModal, CrudField } from '@/components/organisms/CrudFormModal';
+import { WhatsAppSendModal } from '@/components/organisms/WhatsAppSendModal';
 import { Card } from '@/components/atoms/Card';
 import { Button } from '@/components/atoms/Button';
 import { FormField } from '@/components/molecules/FormField';
@@ -49,6 +50,7 @@ export default function InvoicesPage() {
   const financial = can('invoice.read_financial');
   const [creating, setCreating] = useState(false);
   const [paying, setPaying] = useState<Invoice | null>(null);
+  const [waInvoice, setWaInvoice] = useState<Invoice | null>(null);
 
   const [customerName, setCustomerName] = useState('');
   const [taxRate, setTaxRate] = useState('20');
@@ -138,6 +140,15 @@ export default function InvoicesPage() {
                 {t('act.payment')}
               </Button>
             )}
+          {can('whatsapp.send') && r.status !== 'DRAFT' && (
+            <Button
+              variant="ghost"
+              className="px-2 py-1 text-xs"
+              onClick={() => setWaInvoice(r)}
+            >
+              💬 {t('wa.sendVia')}
+            </Button>
+          )}
           {['DRAFT', 'SENT'].includes(r.status) && can('invoice.update') && (
             <Button
               variant="danger"
@@ -255,6 +266,17 @@ export default function InvoicesPage() {
             await api.post(`/invoices/${paying.id}/payments`, v);
             invalidate();
           }}
+        />
+      )}
+
+      {waInvoice && (
+        <WhatsAppSendModal
+          initialBody={t('wa.invoiceMsg')
+            .replace('{name}', waInvoice.customerName)
+            .replace('{number}', waInvoice.number ?? '—')
+            .replace('{total}', (financial && waInvoice.total) || '…')
+            .replace('{currency}', waInvoice.currency)}
+          onClose={() => setWaInvoice(null)}
         />
       )}
     </DashboardTemplate>

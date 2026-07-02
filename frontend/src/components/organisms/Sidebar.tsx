@@ -68,6 +68,9 @@ export function Sidebar() {
           {can('meeting.read') && (
             <NavItem href="/meetings" label={t('nav.meetings')} />
           )}
+          {can('whatsapp.read') && (
+            <NavItem href="/whatsapp" label={t('nav.whatsapp')} />
+          )}
         </NavSection>
 
         <NavSection title={t('nav.grpFinance')} {...sec('finance')}>

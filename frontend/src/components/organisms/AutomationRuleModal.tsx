@@ -8,7 +8,7 @@ import { FormField } from '../molecules/FormField';
 import { Button } from '../atoms/Button';
 
 export interface RuleAction {
-  type: 'create_activity' | 'send_email' | 'log';
+  type: 'create_activity' | 'send_email' | 'send_whatsapp' | 'log';
   note?: string;
   template?: string;
   to?: string;
@@ -29,7 +29,12 @@ const TRIGGERS = [
   'invoice.paid',
   'invoice.issued',
 ];
-const ACTION_TYPES: RuleAction['type'][] = ['create_activity', 'send_email', 'log'];
+const ACTION_TYPES: RuleAction['type'][] = [
+  'create_activity',
+  'send_email',
+  'send_whatsapp',
+  'log',
+];
 
 export function AutomationRuleModal({
   rule,
@@ -60,6 +65,8 @@ export function AutomationRuleModal({
     actions.map((a) => {
       if (a.type === 'send_email')
         return { type: a.type, template: a.template || undefined, to: a.to || undefined };
+      if (a.type === 'send_whatsapp')
+        return { type: a.type, note: a.note || undefined, to: a.to || undefined };
       return { type: a.type, note: a.note || undefined };
     });
 
@@ -214,6 +221,21 @@ export function AutomationRuleModal({
               <input
                 className="rounded-md border border-gray-300 px-2 py-1.5 text-sm"
                 placeholder={t('auto.toPh')}
+                value={a.to ?? ''}
+                onChange={(e) => setAction(i, { to: e.target.value })}
+              />
+            </div>
+          ) : a.type === 'send_whatsapp' ? (
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              <input
+                className="rounded-md border border-gray-300 px-2 py-1.5 text-sm"
+                placeholder={t('wa.message') + ' — {{firstName}}…'}
+                value={a.note ?? ''}
+                onChange={(e) => setAction(i, { note: e.target.value })}
+              />
+              <input
+                className="rounded-md border border-gray-300 px-2 py-1.5 text-sm"
+                placeholder={t('auto.sendWhatsappHint')}
                 value={a.to ?? ''}
                 onChange={(e) => setAction(i, { to: e.target.value })}
               />

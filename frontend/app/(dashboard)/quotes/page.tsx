@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/auth';
 import { useI18n } from '@/lib/i18n';
 import { DashboardTemplate } from '@/components/templates/DashboardTemplate';
 import { DataTable, Column } from '@/components/organisms/DataTable';
+import { WhatsAppSendModal } from '@/components/organisms/WhatsAppSendModal';
 import { Card } from '@/components/atoms/Card';
 import { Button } from '@/components/atoms/Button';
 import { Spinner } from '@/components/atoms/Spinner';
@@ -47,6 +48,7 @@ export default function QuotesPage() {
   const { can } = useAuth();
   const { t } = useI18n();
   const qc = useQueryClient();
+  const [waQuote, setWaQuote] = useState<Quote | null>(null);
   const [customerName, setCustomerName] = useState('');
   const [taxRate, setTaxRate] = useState('20');
   const [lines, setLines] = useState<LineItem[]>([
@@ -162,6 +164,15 @@ export default function QuotesPage() {
                 {t('act.invoice')}
               </Button>
             )}
+          {can('whatsapp.send') && r.status !== 'DRAFT' && (
+            <Button
+              variant="ghost"
+              className="px-2 py-1 text-xs"
+              onClick={() => setWaQuote(r)}
+            >
+              💬 {t('wa.sendVia')}
+            </Button>
+          )}
           {r.status !== 'CONVERTED' && can('quote.delete') && (
             <Button
               variant="danger"
@@ -283,6 +294,17 @@ export default function QuotesPage() {
           columns={columns}
           rows={quotes.data ?? []}
           empty={t('common.empty')}
+        />
+      )}
+
+      {waQuote && (
+        <WhatsAppSendModal
+          initialBody={t('wa.quoteMsg')
+            .replace('{name}', waQuote.customerName)
+            .replace('{number}', waQuote.number ?? '—')
+            .replace('{total}', waQuote.total)
+            .replace('{currency}', waQuote.currency)}
+          onClose={() => setWaQuote(null)}
         />
       )}
     </DashboardTemplate>

@@ -9,6 +9,7 @@ import { DashboardTemplate } from '@/components/templates/DashboardTemplate';
 import { DataTable, Column } from '@/components/organisms/DataTable';
 import { CrudFormModal, CrudField } from '@/components/organisms/CrudFormModal';
 import { ConvertLeadModal } from '@/components/organisms/ConvertLeadModal';
+import { WhatsAppSendModal } from '@/components/organisms/WhatsAppSendModal';
 import { Badge } from '@/components/atoms/Badge';
 import { Button } from '@/components/atoms/Button';
 import { Spinner } from '@/components/atoms/Spinner';
@@ -66,6 +67,7 @@ export default function LeadsPage() {
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<UnqualifiedLead | null>(null);
   const [converting, setConverting] = useState<UnqualifiedLead | null>(null);
+  const [waTarget, setWaTarget] = useState<UnqualifiedLead | null>(null);
   const [fChannel, setFChannel] = useState('');
   const [fStatus, setFStatus] = useState('');
   const [fSource, setFSource] = useState('');
@@ -105,19 +107,34 @@ export default function LeadsPage() {
     {
       key: 'action',
       header: '',
-      render: (r) =>
-        can('lead.convert') && r.status !== 'CONVERTED' ? (
-          <Button
-            variant="secondary"
-            className="px-2 py-1 text-xs"
-            onClick={(e) => {
-              e.stopPropagation();
-              setConverting(r);
-            }}
-          >
-            {t('act.convert')}
-          </Button>
-        ) : null,
+      render: (r) => (
+        <div className="flex justify-end gap-2">
+          {can('whatsapp.send') && r.phone && (
+            <Button
+              variant="ghost"
+              className="px-2 py-1 text-xs"
+              onClick={(e) => {
+                e.stopPropagation();
+                setWaTarget(r);
+              }}
+            >
+              💬 WhatsApp
+            </Button>
+          )}
+          {can('lead.convert') && r.status !== 'CONVERTED' && (
+            <Button
+              variant="secondary"
+              className="px-2 py-1 text-xs"
+              onClick={(e) => {
+                e.stopPropagation();
+                setConverting(r);
+              }}
+            >
+              {t('act.convert')}
+            </Button>
+          )}
+        </div>
+      ),
     },
   ];
 
@@ -225,6 +242,14 @@ export default function LeadsPage() {
           lead={converting}
           onClose={() => setConverting(null)}
           onConverted={invalidate}
+        />
+      )}
+
+      {waTarget && (
+        <WhatsAppSendModal
+          initialPhone={waTarget.phone ?? ''}
+          leadId={waTarget.id}
+          onClose={() => setWaTarget(null)}
         />
       )}
     </DashboardTemplate>
